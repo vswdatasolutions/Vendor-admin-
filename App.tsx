@@ -3,8 +3,8 @@ import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthScreen } from './components/auth/AuthScreen.tsx';
 import { MainLayout } from './components/layout/MainLayout.tsx';
 import { OverviewPage } from './pages/OverviewPage.tsx';
-import { OrdersPage } from './pages/OrdersPage.tsx';
-import { MenuPage } from './pages/MenuPage.tsx';
+// Removed: import { OrdersPage } from './pages/OrdersPage.tsx'; // Removed per request
+// Removed: import { MenuPage } from './pages/MenuPage.tsx'; // Removed per request
 import { StaffPage } from './pages/StaffPage.tsx';
 import { RoleAccessPage } from './pages/RoleAccessPage.tsx';
 import { ReportsPage } from './pages/ReportsPage.tsx';
@@ -34,8 +34,8 @@ const App: React.FC = () => {
               <MainLayout onLogout={() => setIsAuthenticated(false)}>
                 <Routes>
                   <Route path={constants.routes.OVERVIEW} element={<OverviewPage />} />
-                  <Route path={constants.routes.ORDERS} element={<OrdersPage />} />
-                  <Route path={constants.routes.MENU} element={<MenuPage />} />
+                  {/* Removed: <Route path={constants.routes.ORDERS} element={<OrdersPage />} /> */}
+                  {/* Removed: <Route path={constants.routes.MENU} element={<MenuPage />} /> */}
                   <Route path={constants.routes.BRANCHES} element={<BranchesPage />} />
                   <Route path={constants.routes.STAFF} element={<StaffPage />} />
                   <Route path={constants.routes.ROLE_ACCESS} element={<RoleAccessPage />} />

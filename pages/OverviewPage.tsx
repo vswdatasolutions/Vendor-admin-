@@ -160,7 +160,7 @@ export const OverviewPage: React.FC = () => {
                       className={`w-6 sm:w-8 md:w-10 bg-offoOrange rounded-t-md transition-all duration-300 hover:bg-offoOrange-dark relative cursor-pointer`}
                     >
                       <span className={`absolute -top-7 left-1/2 -translate-x-1/2 text-xs text-${constants.colors.ACCENT_GRAY} font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap bg-gray-700 py-1 px-2 rounded shadow-sm z-10`}>
-                        ${data.sales.toLocaleString()}
+                        ₹{data.sales.toLocaleString()}
                       </span>
                     </div>
                     <span className={`mt-1 text-xs text-${constants.colors.ACCENT_GRAY} font-medium`}>{data.date}</span>
@@ -170,7 +170,7 @@ export const OverviewPage: React.FC = () => {
             ) : (
               <p className={`text-${constants.colors.ACCENT_GRAY} text-center py-4`}>No sales data available for this period.</p>
             )}
-            <p className={`mt-4 text-sm text-${constants.colors.ACCENT_GRAY}`}>This is an interactive chart placeholder. Total Sales: <span className={`font-semibold text-${constants.colors.TEXT_DARK}`}>${chartData.reduce((sum, d) => sum + d.sales, 0).toLocaleString()}</span></p>
+            <p className={`mt-4 text-sm text-${constants.colors.ACCENT_GRAY}`}>This is an interactive chart placeholder. Total Sales: <span className={`font-semibold text-${constants.colors.TEXT_DARK}`}>₹{chartData.reduce((sum, d) => sum + d.sales, 0).toLocaleString()}</span></p>
           </div>
         </Card>
 
@@ -186,7 +186,7 @@ export const OverviewPage: React.FC = () => {
                       <p className={`font-semibold text-base text-${constants.colors.TEXT_DARK}`}>Order #{order.id}</p>
                       <span className={getStatusBadgeClasses(order.status)}>{order.status}</span>
                     </div>
-                    <p className="text-sm text-offoSlate">{order.customerName} - <span className="font-semibold text-offoOrange">${order.totalAmount.toFixed(2)}</span></p>
+                    <p className="text-sm text-offoSlate">{order.customerName} - <span className="font-semibold text-offoOrange">₹{order.totalAmount.toFixed(2)}</span></p>
                   </div>
                   <span className={`text-xs text-${constants.colors.ACCENT_GRAY}`}>{getTimeDifference(order.orderTime)}</span>
                 </div>

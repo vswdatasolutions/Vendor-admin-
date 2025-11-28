@@ -2,8 +2,8 @@ export const constants = {
   routes: {
     LOGIN: '/login',
     OVERVIEW: '/overview',
-    ORDERS: '/orders',
-    MENU: '/menu',
+    // Removed: ORDERS: '/orders', // Removed per request
+    // Removed: MENU: '/menu', // Removed per request
     BRANCHES: '/branches',
     STAFF: '/staff',
     ROLE_ACCESS: '/roles-access',

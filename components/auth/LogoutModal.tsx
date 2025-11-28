@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Modal from '../common/Modal.tsx';
 import Button from '../common/Button.tsx';
