@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OFFO Vendor Admin Panel</title>
+    <!-- Tailwind CSS CDN with custom configuration -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        offoOrange: '#FF7A00',
+                        'offoOrange-dark': '#E66A00', // Slightly darker for hover states
+                        offoDark: '#0D1B2A', // Very dark, for sidebar/login bg
+                        'offoDark-light': '#213F5F', // Slightly lighter for hover states on dark elements
+                        offoSlate: '#64748B', // Tailwind's slate-600 is a good match for Slate Gray
+                        
+                        // Colors for light theme and specific elements
+                        offoHeaderBg: '#FF7A00', // Primary orange for header
+                        offoPrimaryBg: '#F3F4F6', // Light gray for main content background
+                        offoCardBgLight: '#FFFFFF', // White for general cards
+                        offoStatCardBgDark: '#102136', // Dark blue-gray for dashboard stat cards
+                        offoTextDark: '#212121', // Dark text for light backgrounds
+                        offoTextLight: '#FFFFFF', // White text for dark backgrounds
+                    },
+                },
+            },
+            plugins: [],
+        }
+    </script>
+    <style>
+        /* Custom keyframe animations for modal */
+        @keyframes modal-in {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-modal-in {
+            animation: modal-in 0.3s ease-out forwards;
+        }
+
+        /* Custom keyframe animation for live order notifications */
+        @keyframes pulse-once {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .animate-pulse-once {
+            animation: pulse-once 1.5s ease-in-out infinite;
+        }
+
+        /* Custom Scrollbar Styling for Webkit browsers */
+        ::-webkit-scrollbar {
+            width: 8px; /* Width of the scrollbar */
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #F3F4F6; /* offoPrimaryBg for the track */
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #FF7A00; /* offoOrange for the scrollbar thumb */
+            border-radius: 4px; /* Rounded corners for the thumb */
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #E66A00; /* offoOrange-dark on hover */
+        }
+
+        /* Custom Text Selection Styling */
+        ::selection {
+            background: #FF7A00; /* offoOrange for selection background */
+            color: #FFFFFF; /* offoTextLight color for contrast */
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.6"
+  }
+}
+</script>
+</head>
+<body class="bg-offoPrimaryBg font-sans antialiased text-offoDark h-full">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>

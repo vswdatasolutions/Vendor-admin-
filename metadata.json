@@ -1,0 +1,7 @@
+{
+  "name": "OFFO Vendor Admin Panel",
+  "description": "A modern, responsive admin panel for OFFO vendors to manage orders, menu, staff, reports, branding, and settings.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
