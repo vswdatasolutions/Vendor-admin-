@@ -23,35 +23,9 @@ export interface Order {
   items: OrderItem[];
   orderTime: string;
   pickupTime?: string;
-  scheduledTime?: string; // For scheduled orders
+  scheduledTime?: string;
   cancellationReason?: string;
   paymentMethod: 'Cash' | 'Card' | 'UPI';
-}
-
-export enum MenuItemType {
-  VEG = 'Veg',
-  NON_VEG = 'Non-Veg',
-  VEGAN = 'Vegan',
-}
-
-export interface MenuItem {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  categoryId: string; // Link to Category
-  categoryName: string; // For display purposes
-  type: MenuItemType;
-  imageUrl: string;
-  isAvailable: boolean;
-  isPopular?: boolean;
-}
-
-export interface Category {
-  id: string;
-  name: string;
-  itemCount: number; // Number of items in this category
-  isAvailable: boolean;
 }
 
 export interface Branch {
@@ -61,8 +35,8 @@ export interface Branch {
   status: 'Active' | 'Disabled';
   manager: string;
   contact: string;
-  latitude: string; // Added for geolocation
-  longitude: string; // Added for geolocation
+  latitude: string;
+  longitude: string;
 }
 
 export enum StaffRole {
@@ -75,8 +49,6 @@ export enum StaffRole {
 
 export type Permission = 
   'view dashboard' | 
-  'manage orders' | 
-  'manage menu' | 
   'manage staff' | 
   'manage branches' | 
   'view reports' | 
@@ -85,15 +57,12 @@ export type Permission =
 
 export const AllPermissions: Permission[] = [
   'view dashboard',
-  'manage orders',
-  'manage menu',
   'manage staff',
   'manage branches',
   'view reports',
   'manage branding',
   'manage settings',
 ];
-
 
 export interface StaffMember {
   id: string;
@@ -104,8 +73,8 @@ export interface StaffMember {
   branchId: string;
   branchName: string;
   isActive: boolean;
-  password?: string; // For creating new staff, sensitive - not usually stored on frontend
-  lastActivity?: Date; // Optional for activity tracking
+  password?: string;
+  lastActivity?: Date;
 }
 
 export interface SalesDataPoint {
@@ -126,10 +95,10 @@ export interface MostSellingItem {
 }
 
 export interface VendorInfo {
-  logoFile?: File; // For upload
-  logoPreviewUrl?: string; // For display
-  bannerFile?: File; // For upload
-  bannerPreviewUrl?: string; // For display
+  logoFile?: File;
+  logoPreviewUrl?: string;
+  bannerFile?: File;
+  bannerPreviewUrl?: string;
   themeColorPrimary: string;
   themeColorSecondary: string;
   cafeName: string;
@@ -171,5 +140,5 @@ export interface Role {
   id: string;
   name: string;
   description: string;
-  permissions: Permission[]; // Use the Permission type
+  permissions: Permission[];
 }

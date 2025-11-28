@@ -2,185 +2,101 @@ import React, { useState } from 'react';
 import Card from '../components/common/Card.tsx';
 import Button from '../components/common/Button.tsx';
 import { constants } from '../constants.ts';
-import { SalesDataPoint, CategorySalesData, MostSellingItem } from '../types.ts';
 
 export const ReportsPage: React.FC = () => {
-  const [selectedReportType, setSelectedReportType] = useState<'daily' | 'weekly' | 'monthly'>('daily');
-  const [selectedGraphType, setSelectedGraphType] = useState<'bar' | 'line' | 'pie'>('bar');
-  const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]); // Today's date for daily filter
+  const [dateRange, setDateRange] = useState('This Month');
 
-  // Dummy Data for Reports
-  const dummySalesData: SalesDataPoint[] = [
-    { date: '2024-07-28', sales: 1200 },
-    { date: '2024-07-27', sales: 950 },
-    { date: '2024-07-26', sales: 1500 },
-    { date: '2024-07-25', sales: 1100 },
+  const topItems = [
+    { name: 'Chicken Burger', qty: 145, rev: 28000 },
+    { name: 'Veg Pizza', qty: 120, rev: 36000 },
+    { name: 'Iced Coffee', qty: 300, rev: 15000 },
+    { name: 'Cheese Fries', qty: 210, rev: 18900 },
   ];
-
-  const dummyCategorySales: CategorySalesData[] = [
-    { category: 'Appetizers', sales: 3000 },
-    { category: 'Main Courses', sales: 8000 },
-    { category: 'Desserts', sales: 2500 },
-    { category: 'Beverages', sales: 1500 },
-  ];
-
-  const dummyMostSellingItems: MostSellingItem[] = [
-    { id: 'item1', name: 'Chicken Tikka Masala', salesCount: 50, revenue: 12500 },
-    { id: 'item2', name: 'Veggie Burger', salesCount: 45, revenue: 6750 },
-    { id: 'item3', name: 'Cold Coffee', salesCount: 70, revenue: 6300 },
-    { id: 'item4', name: 'Paneer Butter Masala', salesCount: 30, revenue: 7500 },
-  ];
-
-  const getSalesData = () => {
-    switch (selectedReportType) {
-      case 'daily': return dummySalesData;
-      case 'weekly': return dummySalesData.map((d, i) => ({ ...d, date: `Week ${i + 1}` }));
-      case 'monthly': return dummySalesData.map((d, i) => ({ ...d, date: `Month ${i + 1}` }));
-      default: return [];
-    }
-  };
-
-  const currentSalesData = getSalesData();
-
-  const handleExport = (format: 'pdf' | 'excel') => {
-    alert(`Exporting ${selectedReportType} sales report as ${format.toUpperCase()}... (Placeholder)`);
-  };
 
   return (
     <div className="space-y-6">
-      <h1 className={`text-3xl font-bold text-${constants.colors.TEXT_DARK} mb-6`}>Reports</h1>
-
-      {/* Report Type Selection */}
-      <Card className="p-4">
-        <h2 className={`text-xl font-semibold text-${constants.colors.TEXT_DARK} mb-3`}>Select Report Type</h2>
-        <div className="flex flex-wrap gap-3 mb-4">
-          <Button
-            variant={selectedReportType === 'daily' ? 'primary' : 'outline'}
-            onClick={() => setSelectedReportType('daily')}
-            size="sm"
-          >
-            Daily Sales
-          </Button>
-          <Button
-            variant={selectedReportType === 'weekly' ? 'primary' : 'outline'}
-            onClick={() => setSelectedReportType('weekly')}
-            size="sm"
-          >
-            Weekly Sales
-          </Button>
-          <Button
-            variant={selectedReportType === 'monthly' ? 'primary' : 'outline'}
-            onClick={() => setSelectedReportType('monthly')}
-            size="sm"
-          >
-            Monthly Sales
-          </Button>
+      <div className="flex justify-between items-center">
+        <h1 className={`text-3xl font-bold text-${constants.colors.TEXT_DARK}`}>Business Reports</h1>
+        <div className="flex bg-white rounded-lg shadow-sm border p-1">
+          {['Today', 'This Week', 'This Month'].map(range => (
+            <button
+              key={range}
+              onClick={() => setDateRange(range)}
+              className={`px-4 py-2 text-sm rounded-md transition-all ${dateRange === range ? 'bg-offoOrange text-white shadow' : 'text-gray-600 hover:bg-gray-100'}`}
+            >
+              {range}
+            </button>
+          ))}
         </div>
-        {selectedReportType === 'daily' && (
-          <div>
-            <label htmlFor="reportDate" className={`block text-sm font-medium text-${constants.colors.TEXT_DARK} mb-1`}>Select Date</label>
-            <input
-              type="date"
-              id="reportDate"
-              value={filterDate}
-              onChange={(e) => setFilterDate(e.target.value)}
-              className={`px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-${constants.colors.TEXT_DARK}`}
-            />
-          </div>
-        )}
-      </Card>
+      </div>
 
-      {/* Sales Data and Graph */}
-      <Card className="p-4">
-        <h2 className={`text-xl font-semibold text-${constants.colors.TEXT_DARK} mb-3`}>Sales Trend</h2>
-        <div className="flex flex-wrap gap-3 mb-4">
-          <Button
-            variant={selectedGraphType === 'bar' ? 'primary' : 'outline'}
-            onClick={() => setSelectedGraphType('bar')}
-            size="sm"
-          >
-            Bar Chart
-          </Button>
-          <Button
-            variant={selectedGraphType === 'line' ? 'primary' : 'outline'}
-            onClick={() => setSelectedGraphType('line')}
-            size="sm"
-          >
-            Line Chart
-          </Button>
-          <Button
-            variant={selectedGraphType === 'pie' ? 'primary' : 'outline'}
-            onClick={() => setSelectedGraphType('pie')}
-            size="sm"
-          >
-            Doughnut Chart
-          </Button>
-        </div>
-        <div className={`bg-gray-100 border border-gray-200 rounded-lg h-64 flex items-center justify-center text-${constants.colors.ACCENT_GRAY}`}>
-          {/* Placeholder for actual chart library (e.g., Chart.js, Recharts) */}
-          <p className="text-center">
-            {selectedGraphType.charAt(0).toUpperCase() + selectedGraphType.slice(1)} Chart Placeholder for {selectedReportType.charAt(0).toUpperCase() + selectedReportType.slice(1)} Sales
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="p-6">
+          <p className="text-gray-500 text-sm font-medium">Total Revenue</p>
+          <h2 className="text-3xl font-bold text-gray-800 mt-2">₹4,25,000</h2>
+          <p className="text-green-500 text-sm mt-2 flex items-center">
+            <span className="mr-1">↑</span> 12.5% vs last period
           </p>
-        </div>
-      </Card>
+        </Card>
+        <Card className="p-6">
+          <p className="text-gray-500 text-sm font-medium">Total Orders</p>
+          <h2 className="text-3xl font-bold text-gray-800 mt-2">1,240</h2>
+          <p className="text-green-500 text-sm mt-2 flex items-center">
+            <span className="mr-1">↑</span> 8.2% vs last period
+          </p>
+        </Card>
+        <Card className="p-6">
+          <p className="text-gray-500 text-sm font-medium">Avg Order Value</p>
+          <h2 className="text-3xl font-bold text-gray-800 mt-2">₹342</h2>
+          <p className="text-red-500 text-sm mt-2 flex items-center">
+            <span className="mr-1">↓</span> 2.1% vs last period
+          </p>
+        </Card>
+      </div>
 
-      {/* Category-wise Sales */}
-      <Card className="p-4">
-        <h2 className={`text-xl font-semibold text-${constants.colors.TEXT_DARK} mb-3`}>Category-wise Sales</h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className={`px-6 py-3 text-left text-xs font-medium text-${constants.colors.ACCENT_GRAY} uppercase tracking-wider`}>Category</th>
-                <th scope="col" className={`px-6 py-3 text-left text-xs font-medium text-${constants.colors.ACCENT_GRAY} uppercase tracking-wider`}>Sales</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {dummyCategorySales.map((data, index) => (
-                <tr key={index}>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium text-${constants.colors.TEXT_DARK}`}>{data.category}</td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm text-${constants.colors.ACCENT_GRAY}`}>₹{data.sales.toFixed(2)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="p-6">
+          <h3 className="text-lg font-bold text-gray-800 mb-6">Top Selling Items</h3>
+          <div className="space-y-4">
+            {topItems.map((item, idx) => (
+              <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-offoOrange/10 text-offoOrange flex items-center justify-center font-bold text-sm">
+                    {idx + 1}
+                  </div>
+                  <span className="font-medium text-gray-800">{item.name}</span>
+                </div>
+                <div className="text-right">
+                  <div className="font-bold text-gray-800">₹{item.rev.toLocaleString()}</div>
+                  <div className="text-xs text-gray-500">{item.qty} units</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
 
-      {/* Most Selling Items */}
-      <Card className="p-4">
-        <h2 className={`text-xl font-semibold text-${constants.colors.TEXT_DARK} mb-3`}>Most Selling Items</h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className={`px-6 py-3 text-left text-xs font-medium text-${constants.colors.ACCENT_GRAY} uppercase tracking-wider`}>Item</th>
-                <th scope="col" className={`px-6 py-3 text-left text-xs font-medium text-${constants.colors.ACCENT_GRAY} uppercase tracking-wider`}>Sales Count</th>
-                <th scope="col" className={`px-6 py-3 text-left text-xs font-medium text-${constants.colors.ACCENT_GRAY} uppercase tracking-wider`}>Revenue</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {dummyMostSellingItems.map((item) => (
-                <tr key={item.id}>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium text-${constants.colors.TEXT_DARK}`}>{item.name}</td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm text-${constants.colors.ACCENT_GRAY}`}>{item.salesCount}</td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm text-${constants.colors.ACCENT_GRAY}`}>₹{item.revenue.toFixed(2)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
-
-      {/* Export Options */}
-      <Card className="p-4 flex justify-end gap-3">
-        <Button variant="outline" onClick={() => handleExport('pdf')}>
-          Export to PDF
-        </Button>
-        <Button variant="outline" onClick={() => handleExport('excel')}>
-          Export to Excel
-        </Button>
-      </Card>
+        <Card className="p-6">
+          <h3 className="text-lg font-bold text-gray-800 mb-6">Sales by Payment Method</h3>
+          <div className="flex flex-col h-64 justify-center space-y-4">
+             {/* Mock horizontal bar chart */}
+             {[
+               { label: 'UPI', val: 75, color: 'bg-green-500' },
+               { label: 'Credit/Debit Card', val: 15, color: 'bg-blue-500' },
+               { label: 'Cash', val: 10, color: 'bg-yellow-500' }
+             ].map(method => (
+               <div key={method.label} className="w-full">
+                 <div className="flex justify-between text-sm mb-1">
+                   <span className="text-gray-600">{method.label}</span>
+                   <span className="font-bold">{method.val}%</span>
+                 </div>
+                 <div className="w-full bg-gray-200 rounded-full h-2.5">
+                   <div className={`${method.color} h-2.5 rounded-full`} style={{ width: `${method.val}%` }}></div>
+                 </div>
+               </div>
+             ))}
+          </div>
+        </Card>
+      </div>
     </div>
   );
 };

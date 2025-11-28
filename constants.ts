@@ -2,8 +2,7 @@ export const constants = {
   routes: {
     LOGIN: '/login',
     OVERVIEW: '/overview',
-    // Removed: ORDERS: '/orders', // Removed per request
-    // Removed: MENU: '/menu', // Removed per request
+    ORDERS: '/orders',
     BRANCHES: '/branches',
     STAFF: '/staff',
     ROLE_ACCESS: '/roles-access',
@@ -13,16 +12,15 @@ export const constants = {
   },
   colors: {
     PRIMARY: 'offoOrange',
-    SECONDARY: 'offoDark', // Used for sidebar, login screen elements
-    ACCENT_GRAY: 'offoSlate', // Secondary text color
-    TEXT_DARK: 'offoTextDark', // Primary text on light backgrounds
-    TEXT_LIGHT: 'offoTextLight', // Primary text on dark backgrounds
-    BG_LIGHT: 'offoPrimaryBg', // Main content area background
-    BG_DARK: 'offoDark', // Sidebar and Login Screen background
-    BG_CARD_LIGHT: 'offoCardBgLight', // General card background
-    BG_STAT_DARK: 'offoStatCardBgDark', // Dashboard stat card background
+    SECONDARY: 'offoDark',
+    ACCENT_GRAY: 'offoSlate',
+    TEXT_DARK: 'offoTextDark',
+    TEXT_LIGHT: 'offoTextLight',
+    BG_LIGHT: 'offoPrimaryBg',
+    BG_DARK: 'offoDark',
+    BG_CARD_LIGHT: 'offoCardBgLight',
+    BG_STAT_DARK: 'offoStatCardBgDark',
   },
   navbarHeight: '64px',
   sidebarWidth: '250px',
-  // Removed logoUrl as we are using text-based branding now
 };

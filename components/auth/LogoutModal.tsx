@@ -11,21 +11,12 @@ interface LogoutModalProps {
 
 const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose, onConfirm }) => {
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Confirm Logout"
-      footer={
-        <>
-          <Button variant="ghost" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button variant="danger" onClick={onConfirm}>
-            Logout
-          </Button>
-        </>
-      }
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title="Confirm Logout" footer={
+      <>
+        <Button variant="ghost" onClick={onClose}>Cancel</Button>
+        <Button variant="danger" onClick={onConfirm}>Logout</Button>
+      </>
+    }>
       <p className={`text-${constants.colors.ACCENT_GRAY}`}>Are you sure you want to log out?</p>
     </Modal>
   );

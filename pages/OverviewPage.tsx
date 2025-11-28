@@ -1,202 +1,139 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Card from '../components/common/Card.tsx';
-import Button from '../components/common/Button.tsx';
 import { constants } from '../constants.ts';
-import { Order, OrderStatus, SalesDataPoint } from '../types.ts';
+import { Order, OrderStatus } from '../types.ts';
 
 export const OverviewPage: React.FC = () => {
-  const [selectedTimeRange, setSelectedTimeRange] = useState<'day' | 'week' | 'month'>('day');
-
-  // Dummy data for statistics
   const stats = [
-    { title: 'Today Orders', value: 12, icon: '📦' },
-    { title: 'Pending Orders', value: 3, icon: '⏳' },
-    { title: 'Preparing Orders', value: 5, icon: '🍳' },
-    { title: 'Pickup Ready', value: 4, icon: '✅' },
-    { title: 'Scheduled Orders', value: 7, icon: '📅' },
-    { title: 'Category Count', value: 10, icon: '🏷️' },
-    { title: 'Item Count', value: 85, icon: '🍔' },
+    { title: 'Today Orders', value: 24, icon: '📦' },
+    { title: 'Pending', value: 3, icon: '⏳' },
+    { title: 'Preparing', value: 5, icon: '🍳' },
+    { title: 'Revenue', value: '₹12,450', icon: '💰' },
   ];
 
-  const liveOrders: Order[] = [
-    { id: 'UR3347', customerName: 'Priya Sharma', totalAmount: 199.00, status: OrderStatus.INCOMING, items: [{id:'chickentikka', name: 'Chicken Tikka Fry', quantity: 1, price: 199.00}], orderTime: new Date(Date.now() - 5 * 60 * 1000).toISOString(), paymentMethod: 'Card' }, // 5 mins ago
-    { id: 'UR3348', customerName: 'Rajesh M', totalAmount: 20.00, status: OrderStatus.INCOMING, items: [{id:'coffee', name: 'Coffee', quantity: 1, price: 20.00}], orderTime: new Date(Date.now() - 10 * 60 * 1000).toISOString(), paymentMethod: 'Cash' }, // 10 mins ago
-    { id: 'UR3349', customerName: 'Primya Sharma', totalAmount: 199.00, status: OrderStatus.PREPARING, items: [{id:'chickentikka2', name: 'Chicken Tikka Fry', quantity: 1, price: 199.00}], orderTime: new Date(Date.now() - 15 * 60 * 1000).toISOString(), paymentMethod: 'UPI' }, // 15 mins ago
+  const recentOrders: Order[] = [
+    { id: 'ORD-001', customerName: 'Rahul Kumar', totalAmount: 450, status: OrderStatus.PREPARING, items: [], orderTime: '10:30 AM', paymentMethod: 'UPI' },
+    { id: 'ORD-002', customerName: 'Priya Sharma', totalAmount: 120, status: OrderStatus.READY_FOR_PICKUP, items: [], orderTime: '10:15 AM', paymentMethod: 'Cash' },
+    { id: 'ORD-003', customerName: 'Amit Singh', totalAmount: 850, status: OrderStatus.COMPLETED, items: [], orderTime: '09:45 AM', paymentMethod: 'Card' },
+    { id: 'ORD-004', customerName: 'Sneha Gupta', totalAmount: 200, status: OrderStatus.PENDING, items: [], orderTime: '10:35 AM', paymentMethod: 'UPI' },
   ];
-
-  // Dummy data for sales summary
-  const dailySales: SalesDataPoint[] = [
-    { date: '2024-07-26', sales: 300 },
-    { date: '2024-07-27', sales: 450 },
-    { date: '2024-07-28', sales: 600 },
-    { date: '2024-07-29', sales: 520 },
-    { date: '2024-07-30', sales: 710 },
-    { date: '2024-07-31', sales: 680 },
-    { date: '2024-08-01', sales: 800 },
-  ];
-
-  const weeklySales: SalesDataPoint[] = [
-    { date: 'Week 1', sales: 2500 },
-    { date: 'Week 2', sales: 3200 },
-    { date: 'Week 3', sales: 2800 },
-    { date: 'Week 4', sales: 3500 },
-  ];
-
-  const monthlySales: SalesDataPoint[] = [
-    { date: 'Jan', sales: 10000 },
-    { date: 'Feb', sales: 12000 },
-    { date: 'Mar', sales: 11500 },
-    { date: 'Apr', sales: 13000 },
-    { date: 'May', sales: 14500 },
-    { date: 'Jun', sales: 13800 },
-    { date: 'Jul', sales: 15200 },
-    { date: 'Aug', sales: 16000 },
-  ];
-
-  const getCurrentChartData = () => {
-    switch (selectedTimeRange) {
-      case 'day':
-        return dailySales;
-      case 'week':
-        return weeklySales;
-      case 'month':
-        return monthlySales;
-      default:
-        return [];
-    }
-  };
-
-  const chartData = getCurrentChartData();
-
-  const getTimeDifference = (orderTime: string) => {
-    const now = new Date();
-    const orderDate = new Date(orderTime);
-    const diffMs = now.getTime() - orderDate.getTime();
-    const diffMinutes = Math.floor(diffMs / (1000 * 60));
-    if (diffMinutes === 0) return 'Just now';
-    if (diffMinutes === 1) return '1 min ago';
-    if (diffMinutes < 60) return `${diffMinutes} mins ago`;
-    const diffHours = Math.floor(diffMinutes / 60);
-    if (diffHours === 1) return '1 hour ago';
-    return `${diffHours} hours ago`;
-  }
 
   const getStatusBadgeClasses = (status: OrderStatus) => {
     const base = 'px-2 py-1 rounded-full text-xs font-medium';
     switch (status) {
-      case OrderStatus.INCOMING:
-        return `${base} bg-offoOrange text-white`; // Solid orange for incoming
-      case OrderStatus.PENDING:
-        return `${base} bg-red-500 text-white`; // Red as per image
-      case OrderStatus.PREPARING:
-        return `${base} bg-blue-500 text-white`;
-      case OrderStatus.READY_FOR_PICKUP:
-        return `${base} bg-green-500 text-white`;
-      case OrderStatus.SCHEDULED:
-        return `${base} bg-purple-500 text-white`;
-      case OrderStatus.COMPLETED:
-        return `${base} bg-green-700 text-white`;
-      case OrderStatus.CANCELLED:
-        return `${base} bg-red-700 text-white`;
-      default:
-        return `${base} bg-gray-500 text-white`;
+      case OrderStatus.INCOMING: return `${base} bg-purple-100 text-purple-800`;
+      case OrderStatus.PENDING: return `${base} bg-yellow-100 text-yellow-800`;
+      case OrderStatus.PREPARING: return `${base} bg-blue-100 text-blue-800`;
+      case OrderStatus.READY_FOR_PICKUP: return `${base} bg-green-100 text-green-800`;
+      case OrderStatus.COMPLETED: return `${base} bg-gray-100 text-gray-800`;
+      default: return `${base} bg-gray-100 text-gray-800`;
     }
   };
 
+  // Simulated chart data
+  const weeklyData = [40, 65, 45, 80, 55, 90, 70];
+  const maxVal = Math.max(...weeklyData);
+
   return (
     <div className="space-y-6">
-      <h1 className={`text-3xl font-bold text-${constants.colors.TEXT_DARK} mb-6`}>Overview</h1>
-
-      {/* Statistics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <h1 className={`text-3xl font-bold text-${constants.colors.TEXT_DARK} mb-6`}>Dashboard Overview</h1>
+      
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, index) => (
-          <Card key={index} className={`flex flex-col items-center justify-center p-6 text-center bg-${constants.colors.BG_STAT_DARK}`}>
-            <div className="text-4xl mb-2" role="img" aria-label={stat.title}>
+          <Card key={index} className={`flex items-center p-6 bg-white border-l-4 border-${constants.colors.PRIMARY}`}>
+            <div className={`p-3 rounded-full bg-orange-100 text-${constants.colors.PRIMARY} mr-4 text-2xl`}>
               {stat.icon}
             </div>
-            <h3 className={`text-lg font-semibold text-${constants.colors.TEXT_LIGHT}`}>{stat.title}</h3>
-            <p className={`text-4xl font-bold text-${constants.colors.TEXT_LIGHT} mt-2`}>{stat.value}</p>
+            <div>
+              <p className="text-sm text-gray-500 font-medium">{stat.title}</p>
+              <h3 className="text-2xl font-bold text-gray-800">{stat.value}</h3>
+            </div>
           </Card>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Sales Summary Chart Placeholder */}
+        {/* Sales Chart Simulation */}
         <Card className="lg:col-span-2 p-6">
-          <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
-            <h2 className={`text-xl font-semibold text-${constants.colors.TEXT_DARK}`}>Sales Summary</h2>
-            <div className="flex space-x-2">
-              <Button
-                variant={selectedTimeRange === 'day' ? 'primary' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedTimeRange('day')}
-              >
-                Day
-              </Button>
-              <Button
-                variant={selectedTimeRange === 'week' ? 'primary' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedTimeRange('week')}
-              >
-                Week
-              </Button>
-              <Button
-                variant={selectedTimeRange === 'month' ? 'primary' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedTimeRange('month')}
-              >
-                Month
-              </Button>
-            </div>
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-bold text-gray-800">Weekly Sales Trend</h3>
+            <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-offoOrange focus:border-offoOrange block p-2">
+              <option>Last 7 Days</option>
+              <option>Last 30 Days</option>
+            </select>
           </div>
-          <div className={`bg-gray-100 border border-gray-200 rounded-lg h-64 flex flex-col justify-center items-center text-${constants.colors.TEXT_DARK} p-4 relative`}>
-            <p className="mb-2 text-lg font-medium">Sales Trend ({selectedTimeRange.charAt(0).toUpperCase() + selectedTimeRange.slice(1)})</p>
-            {chartData.length > 0 ? (
-              <div className="w-full h-full flex items-end justify-around space-x-2 px-2 pb-2">
-                {chartData.map((data, index) => (
-                  <div key={index} className="flex flex-col items-center group relative h-full justify-end">
-                    <div
-                      style={{ height: `${(data.sales / Math.max(...chartData.map(d => d.sales))) * 80 + 10}%` }} // Scale bars relative to max sales, min 10% for visibility
-                      className={`w-6 sm:w-8 md:w-10 bg-offoOrange rounded-t-md transition-all duration-300 hover:bg-offoOrange-dark relative cursor-pointer`}
-                    >
-                      <span className={`absolute -top-7 left-1/2 -translate-x-1/2 text-xs text-${constants.colors.ACCENT_GRAY} font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap bg-gray-700 py-1 px-2 rounded shadow-sm z-10`}>
-                        ₹{data.sales.toLocaleString()}
-                      </span>
-                    </div>
-                    <span className={`mt-1 text-xs text-${constants.colors.ACCENT_GRAY} font-medium`}>{data.date}</span>
+          <div className="h-64 flex items-end justify-between gap-2">
+            {weeklyData.map((val, idx) => (
+              <div key={idx} className="w-full flex flex-col items-center group">
+                <div 
+                  className={`w-full bg-${constants.colors.PRIMARY} rounded-t-sm transition-all duration-300 hover:opacity-80 relative`}
+                  style={{ height: `${(val / maxVal) * 100}%` }}
+                >
+                  <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                    {val} orders
                   </div>
-                ))}
+                </div>
+                <span className="text-xs text-gray-500 mt-2">
+                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][idx]}
+                </span>
               </div>
-            ) : (
-              <p className={`text-${constants.colors.ACCENT_GRAY} text-center py-4`}>No sales data available for this period.</p>
-            )}
-            <p className={`mt-4 text-sm text-${constants.colors.ACCENT_GRAY}`}>This is an interactive chart placeholder. Total Sales: <span className={`font-semibold text-${constants.colors.TEXT_DARK}`}>₹{chartData.reduce((sum, d) => sum + d.sales, 0).toLocaleString()}</span></p>
+            ))}
           </div>
         </Card>
 
-        {/* Live Order Notifications */}
+        {/* Action Center */}
         <Card className="p-6">
-          <h2 className={`text-xl font-semibold text-${constants.colors.TEXT_DARK} mb-4`}>Live Order Notifications</h2>
-          <div className="space-y-4">
-            {liveOrders.length > 0 ? (
-              liveOrders.filter(order => order.status === OrderStatus.INCOMING || order.status === OrderStatus.PREPARING).map((order) => (
-                <div key={order.id} className="flex justify-between items-center bg-offoOrange bg-opacity-10 text-offoOrange p-3 rounded-lg border-l-4 border-offoOrange animate-pulse-once">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className={`font-semibold text-base text-${constants.colors.TEXT_DARK}`}>Order #{order.id}</p>
-                      <span className={getStatusBadgeClasses(order.status)}>{order.status}</span>
-                    </div>
-                    <p className="text-sm text-offoSlate">{order.customerName} - <span className="font-semibold text-offoOrange">₹{order.totalAmount.toFixed(2)}</span></p>
-                  </div>
-                  <span className={`text-xs text-${constants.colors.ACCENT_GRAY}`}>{getTimeDifference(order.orderTime)}</span>
-                </div>
-              ))
-            ) : (
-              <p className={`text-${constants.colors.ACCENT_GRAY} text-center py-4`}>No live orders at the moment.</p>
-            )}
+          <h3 className="text-lg font-bold text-gray-800 mb-4">Quick Actions</h3>
+          <div className="space-y-3">
+            <button className={`w-full text-left px-4 py-3 rounded-lg bg-orange-50 text-${constants.colors.PRIMARY} font-medium hover:bg-orange-100 transition-colors`}>
+              + Add New Menu Item
+            </button>
+            <button className="w-full text-left px-4 py-3 rounded-lg bg-gray-50 text-gray-700 font-medium hover:bg-gray-100 transition-colors">
+              Manage Staff Shifts
+            </button>
+            <button className="w-full text-left px-4 py-3 rounded-lg bg-gray-50 text-gray-700 font-medium hover:bg-gray-100 transition-colors">
+              Update Store Timings
+            </button>
+            <button className="w-full text-left px-4 py-3 rounded-lg bg-gray-50 text-gray-700 font-medium hover:bg-gray-100 transition-colors">
+              Download Reports
+            </button>
           </div>
         </Card>
       </div>
+
+      {/* Recent Orders */}
+      <Card className="p-6">
+        <h3 className="text-lg font-bold text-gray-800 mb-4">Recent Orders</h3>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {recentOrders.map((order) => (
+                <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.customerName}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={getStatusBadgeClasses(order.status)}>{order.status}</span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">₹{order.totalAmount}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.paymentMethod}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.orderTime}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
     </div>
   );
 };

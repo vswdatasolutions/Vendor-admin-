@@ -3,18 +3,17 @@ import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthScreen } from './components/auth/AuthScreen.tsx';
 import { MainLayout } from './components/layout/MainLayout.tsx';
 import { OverviewPage } from './pages/OverviewPage.tsx';
-// Removed: import { OrdersPage } from './pages/OrdersPage.tsx'; // Removed per request
-// Removed: import { MenuPage } from './pages/MenuPage.tsx'; // Removed per request
 import { StaffPage } from './pages/StaffPage.tsx';
 import { RoleAccessPage } from './pages/RoleAccessPage.tsx';
 import { ReportsPage } from './pages/ReportsPage.tsx';
 import { BrandingPage } from './pages/BrandingPage.tsx';
 import { SettingsPage } from './pages/SettingsPage.tsx';
 import { BranchesPage } from './pages/BranchesPage.tsx';
+import { OrdersPage } from './pages/OrdersPage.tsx';
 import { constants } from './constants.ts';
 
 const App: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false); // Simulate authentication
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   const handleLogin = (isSuccess: boolean) => {
     setIsAuthenticated(isSuccess);
@@ -34,8 +33,7 @@ const App: React.FC = () => {
               <MainLayout onLogout={() => setIsAuthenticated(false)}>
                 <Routes>
                   <Route path={constants.routes.OVERVIEW} element={<OverviewPage />} />
-                  {/* Removed: <Route path={constants.routes.ORDERS} element={<OrdersPage />} /> */}
-                  {/* Removed: <Route path={constants.routes.MENU} element={<MenuPage />} /> */}
+                  <Route path={constants.routes.ORDERS} element={<OrdersPage />} />
                   <Route path={constants.routes.BRANCHES} element={<BranchesPage />} />
                   <Route path={constants.routes.STAFF} element={<StaffPage />} />
                   <Route path={constants.routes.ROLE_ACCESS} element={<RoleAccessPage />} />
