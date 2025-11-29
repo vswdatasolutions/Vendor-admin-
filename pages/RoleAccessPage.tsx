@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Button from '../components/common/Button.tsx';
 import Modal from '../components/common/Modal.tsx';
@@ -9,33 +10,44 @@ export const RoleAccessPage: React.FC = () => {
     { 
       id: 'admin', 
       name: 'Super Admin', 
-      description: 'Full access to all system features.', 
-      permissions: [...AllPermissions] 
+      description: 'Full access to all system features. Cannot be edited.', 
+      permissions: [...AllPermissions],
+      isSystem: true // Locked role
     },
     { 
       id: 'manager', 
       name: 'Branch Manager', 
       description: 'Can manage branches and staff.', 
-      permissions: ['view dashboard', 'manage staff', 'manage branches'] 
+      permissions: ['view dashboard', 'manage staff', 'manage branches'],
+      isSystem: false
     },
     { 
       id: 'kitchen', 
       name: 'Kitchen Staff', 
       description: 'Can only view orders and dashboard.', 
-      permissions: ['view dashboard', 'manage orders' as Permission] // Casting for custom permission for demo
+      permissions: ['view dashboard', 'manage orders' as Permission],
+      isSystem: false
     },
     {
       id: 'billing',
       name: 'Billing Staff',
       description: 'Manages payment and reports.',
-      permissions: ['view dashboard', 'view reports', 'manage orders' as Permission]
+      permissions: ['view dashboard', 'view reports', 'manage orders' as Permission],
+      isSystem: false
     }
   ]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
 
+  // Confirmation Modal
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{ isOpen: boolean, roleId: string | null }>({
+      isOpen: false,
+      roleId: null
+  });
+
   const openPermissionModal = (role: Role) => {
+    if (role.isSystem) return; // Guard clause
     setEditingRole({...role}); // Create a copy to edit
     setIsModalOpen(true);
   };
@@ -45,15 +57,22 @@ export const RoleAccessPage: React.FC = () => {
           id: Math.random().toString(36).substr(2, 9),
           name: 'New Role',
           description: 'Description here...',
-          permissions: ['view dashboard']
+          permissions: ['view dashboard'],
+          isSystem: false
       };
       setEditingRole(newRole);
       setIsModalOpen(true);
   };
 
-  const deleteRole = (id: string) => {
-      if(window.confirm('Are you sure you want to delete this role?')) {
-          setRoles(roles.filter(r => r.id !== id));
+  const requestDeleteRole = (role: Role) => {
+      if (role.isSystem) return;
+      setDeleteConfirmation({ isOpen: true, roleId: role.id });
+  };
+
+  const confirmDeleteRole = () => {
+      if (deleteConfirmation.roleId) {
+          setRoles(roles.filter(r => r.id !== deleteConfirmation.roleId));
+          setDeleteConfirmation({ isOpen: false, roleId: null });
       }
   };
 
@@ -89,6 +108,7 @@ export const RoleAccessPage: React.FC = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className={`text-3xl font-bold text-${constants.colors.TEXT_DARK}`}>Roles & Permissions</h1>
+          <p className="text-gray-500 mt-1">Manage access levels. <span className="font-semibold text-offoOrange">Super Admin</span> approval required for new roles.</p>
         </div>
         <button 
             onClick={createRole} 
@@ -100,26 +120,35 @@ export const RoleAccessPage: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {roles.map(role => (
-          <div key={role.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex flex-col relative h-full">
+          <div key={role.id} className={`bg-white rounded-xl p-6 shadow-sm border flex flex-col relative h-full ${role.isSystem ? 'border-l-4 border-l-offoOrange border-y-gray-100 border-r-gray-100' : 'border-gray-100'}`}>
             {/* Delete Icon */}
-            <button 
-                onClick={() => deleteRole(role.id)}
-                className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition-colors"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-            </button>
+            {!role.isSystem && (
+                <button 
+                    onClick={() => requestDeleteRole(role)}
+                    className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition-colors"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            )}
 
             {/* Header */}
             <div className="flex gap-4 items-start mb-4 pr-8">
-                <div className="w-12 h-12 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V9a2 2 0 012-2h2zM7 15a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H9a2 2 0 01-2-2v-4zM12 9v6m-4-6V9m8 0V9m-4 4h.01M17 19h.01M13 13h.01" />
-                    </svg>
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${role.isSystem ? 'bg-orange-100 text-offoOrange' : 'bg-purple-50 text-purple-600'}`}>
+                    {role.isSystem ? (
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V9a2 2 0 012-2h2zM7 15a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H9a2 2 0 01-2-2v-4zM12 9v6m-4-6V9m8 0V9m-4 4h.01M17 19h.01M13 13h.01" />
+                        </svg>
+                    )}
                 </div>
                 <div>
-                    <h3 className="text-lg font-bold text-gray-900">{role.name}</h3>
+                    <div className="flex items-center gap-2">
+                         <h3 className="text-lg font-bold text-gray-900">{role.name}</h3>
+                         {role.isSystem && <span className="bg-gray-100 text-gray-600 text-[10px] uppercase font-bold px-2 py-0.5 rounded border border-gray-200">System</span>}
+                    </div>
                     <p className="text-gray-500 text-sm mt-1 leading-snug">{role.description}</p>
                 </div>
             </div>
@@ -138,12 +167,16 @@ export const RoleAccessPage: React.FC = () => {
 
             {/* Footer */}
             <div className="mt-6 flex justify-end">
-                <button 
-                    onClick={() => openPermissionModal(role)}
-                    className="px-4 py-1.5 border border-orange-500 text-orange-500 rounded text-sm font-medium hover:bg-orange-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-orange-500"
-                >
-                    Edit Permissions
-                </button>
+                {role.isSystem ? (
+                    <span className="text-xs text-gray-400 italic py-2">Full access granted by system</span>
+                ) : (
+                    <button 
+                        onClick={() => openPermissionModal(role)}
+                        className="px-4 py-1.5 border border-orange-500 text-orange-500 rounded text-sm font-medium hover:bg-orange-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-orange-500"
+                    >
+                        Edit Permissions
+                    </button>
+                )}
             </div>
           </div>
         ))}
@@ -221,6 +254,21 @@ export const RoleAccessPage: React.FC = () => {
                 <Button onClick={saveRole}>Save Role</Button>
             </div>
         </div>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={deleteConfirmation.isOpen}
+        onClose={() => setDeleteConfirmation({ isOpen: false, roleId: null })}
+        title="Confirm Deletion"
+        footer={
+            <>
+                <Button variant="ghost" onClick={() => setDeleteConfirmation({ isOpen: false, roleId: null })}>Cancel</Button>
+                <Button variant="danger" onClick={confirmDeleteRole}>Delete</Button>
+            </>
+        }
+      >
+          <p className="text-gray-600">Are you sure you want to delete this role? Users assigned to this role may lose access.</p>
       </Modal>
     </div>
   );

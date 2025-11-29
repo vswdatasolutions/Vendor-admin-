@@ -1,6 +1,4 @@
 
-
-
 import React, { useState, useEffect, useMemo } from 'react';
 import Card from '../components/common/Card.tsx';
 import Button from '../components/common/Button.tsx';
@@ -70,7 +68,7 @@ export const OrdersPage: React.FC = () => {
 
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
-    action: 'accept-all' | 'reject-all' | 'reject-selected' | null;
+    action: 'accept-all' | 'reject-all' | 'reject-selected' | 'accept-selected' | null;
     count: number;
   }>({ isOpen: false, action: null, count: 0 });
 
@@ -235,23 +233,14 @@ export const OrdersPage: React.FC = () => {
     }
   };
 
-  const handleBulkAction = (action: 'accept' | 'reject' | 'ready' | 'complete' | 'prepare') => {
+  const handleBulkAction = (action: 'accept' | 'reject') => {
       const count = selectedOrderIds.size;
+      if (count === 0) return;
+
       if (action === 'reject') {
         setConfirmModal({ isOpen: true, action: 'reject-selected', count });
-        return;
-      }
-      let newStatus: OrderStatus;
-      switch(action) {
-          case 'accept': newStatus = OrderStatus.PREPARING; break;
-          case 'ready': newStatus = OrderStatus.READY_FOR_PICKUP; break;
-          case 'complete': newStatus = OrderStatus.COMPLETED; break;
-          case 'prepare': newStatus = OrderStatus.PREPARING; break;
-          default: return;
-      }
-      if(window.confirm(`Perform bulk action on ${count} orders?`)) {
-          setAllOrders(prev => prev.map(o => selectedOrderIds.has(o.id) ? {...o, status: newStatus} : o));
-          setSelectedOrderIds(new Set());
+      } else if (action === 'accept') {
+        setConfirmModal({ isOpen: true, action: 'accept-selected', count });
       }
   };
 
@@ -273,6 +262,10 @@ export const OrdersPage: React.FC = () => {
         setAllOrders(prev => prev.map(o => selectedOrderIds.has(o.id) ? {...o, status: OrderStatus.CANCELLED} : o));
         setSelectedOrderIds(new Set());
         showNotification(`Rejected ${confirmModal.count} orders`);
+    } else if (action === 'accept-selected') {
+        setAllOrders(prev => prev.map(o => selectedOrderIds.has(o.id) ? {...o, status: OrderStatus.PREPARING} : o));
+        setSelectedOrderIds(new Set());
+        showNotification(`Accepted ${confirmModal.count} orders`);
     } else if (action === 'accept-all') {
         setAllOrders(prev => prev.map(o => 
            (o.branchId === currentBranchId && (o.status === OrderStatus.INCOMING || o.status === OrderStatus.PENDING))
@@ -506,7 +499,7 @@ export const OrdersPage: React.FC = () => {
              </button>
         </div>
 
-        {/* Filter Bar (Hidden in screenshot, but good to keep optional or visible) */}
+        {/* Filter Bar */}
         {selectedOrderIds.size > 0 && (
              <div className="bg-orange-50 border-x border-gray-200 p-3 flex justify-between items-center px-6">
                  <span className="text-sm font-medium text-orange-800">{selectedOrderIds.size} Orders Selected</span>
@@ -593,13 +586,14 @@ export const OrdersPage: React.FC = () => {
         title={
             confirmModal.action === 'accept-all' ? 'Accept All Orders?' :
             confirmModal.action === 'reject-all' ? 'Reject All Orders?' :
-            'Reject Selected Orders?'
+            confirmModal.action === 'reject-selected' ? 'Reject Selected Orders?' :
+            'Accept Selected Orders?'
         }
         footer={
             <>
                 <Button variant="ghost" onClick={() => setConfirmModal({ ...confirmModal, isOpen: false })}>Cancel</Button>
                 <Button 
-                    variant={confirmModal.action === 'accept-all' ? 'primary' : 'danger'} 
+                    variant={confirmModal.action === 'accept-all' || confirmModal.action === 'accept-selected' ? 'primary' : 'danger'} 
                     onClick={handleConfirmAction}
                 >
                     Confirm
@@ -611,6 +605,7 @@ export const OrdersPage: React.FC = () => {
             {confirmModal.action === 'accept-all' && `Are you sure you want to accept all ${confirmModal.count} incoming orders?`}
             {confirmModal.action === 'reject-all' && `Are you sure you want to REJECT all ${confirmModal.count} incoming orders?`}
             {confirmModal.action === 'reject-selected' && `Are you sure you want to reject the selected ${confirmModal.count} orders?`}
+            {confirmModal.action === 'accept-selected' && `Are you sure you want to accept the selected ${confirmModal.count} orders?`}
         </p>
       </Modal>
     </div>

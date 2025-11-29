@@ -6,13 +6,21 @@ import Modal from '../components/common/Modal.tsx';
 import { constants } from '../constants.ts';
 import { Branch } from '../types.ts';
 import { useBranch } from '../context/BranchContext.tsx';
+import { useNavigate } from 'react-router-dom';
 
 export const BranchesPage: React.FC = () => {
   const { branches, setBranches, currentBranchId, setCurrentBranchId } = useBranch();
+  const navigate = useNavigate();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBranch, setEditingBranch] = useState<Branch | null>(null);
   const [formData, setFormData] = useState<Partial<Branch>>({});
+  
+  // Confirmation Modal State
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{ isOpen: boolean, branchId: string | null }>({
+      isOpen: false,
+      branchId: null
+  });
 
   const openModal = (branch?: Branch) => {
     if (branch) {
@@ -25,7 +33,7 @@ export const BranchesPage: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const deleteBranch = (id: string) => {
+  const requestDeleteBranch = (id: string) => {
     if (branches.length <= 1) {
         alert("You cannot delete the only remaining branch.");
         return;
@@ -34,9 +42,13 @@ export const BranchesPage: React.FC = () => {
         alert("You cannot delete the currently selected branch. Please switch branches first.");
         return;
     }
+    setDeleteConfirmation({ isOpen: true, branchId: id });
+  };
 
-    if(window.confirm('Are you sure you want to delete this branch?')) {
-        setBranches(branches.filter(b => b.id !== id));
+  const confirmDeleteBranch = () => {
+    if (deleteConfirmation.branchId) {
+        setBranches(branches.filter(b => b.id !== deleteConfirmation.branchId));
+        setDeleteConfirmation({ isOpen: false, branchId: null });
     }
   };
 
@@ -49,6 +61,11 @@ export const BranchesPage: React.FC = () => {
       setBranches([...branches, newBranch]);
     }
     setIsModalOpen(false);
+  };
+
+  const handleViewStaff = (branchId: string) => {
+      setCurrentBranchId(branchId);
+      navigate(constants.routes.STAFF);
   };
 
   return (
@@ -91,7 +108,7 @@ export const BranchesPage: React.FC = () => {
                     <span className={`px-3 py-1 rounded-full text-xs font-medium text-white ${b.status === 'Active' ? 'bg-green-500' : 'bg-red-500'}`}>
                         {b.status}
                     </span>
-                    <button onClick={() => deleteBranch(b.id)} className="text-gray-400 hover:text-red-500 transition-colors" title="Delete Branch">
+                    <button onClick={() => requestDeleteBranch(b.id)} className="text-gray-400 hover:text-red-500 transition-colors" title="Delete Branch">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
@@ -125,6 +142,12 @@ export const BranchesPage: React.FC = () => {
                     className="flex-1 px-4 py-1.5 border border-orange-500 text-orange-500 rounded text-sm font-medium hover:bg-orange-50 transition-colors focus:outline-none"
                 >
                     Edit Details
+                </button>
+                <button 
+                    onClick={() => handleViewStaff(b.id)}
+                    className="flex-1 px-4 py-1.5 border border-blue-500 text-blue-500 rounded text-sm font-medium hover:bg-blue-50 transition-colors focus:outline-none"
+                >
+                    View Staff
                 </button>
                 {b.id !== currentBranchId && (
                     <button 
@@ -227,6 +250,21 @@ export const BranchesPage: React.FC = () => {
               <Button type="submit">Save Branch</Button>
             </div>
          </form>
+      </Modal>
+      
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={deleteConfirmation.isOpen}
+        onClose={() => setDeleteConfirmation({ isOpen: false, branchId: null })}
+        title="Confirm Deletion"
+        footer={
+            <>
+                <Button variant="ghost" onClick={() => setDeleteConfirmation({ isOpen: false, branchId: null })}>Cancel</Button>
+                <Button variant="danger" onClick={confirmDeleteBranch}>Delete</Button>
+            </>
+        }
+      >
+          <p className="text-gray-600">Are you sure you want to delete this branch? This action cannot be undone.</p>
       </Modal>
     </div>
   );

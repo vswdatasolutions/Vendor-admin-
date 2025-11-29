@@ -170,4 +170,5 @@ export interface Role {
   name: string;
   description: string;
   permissions: Permission[];
+  isSystem?: boolean; // New field to lock super admin roles
 }

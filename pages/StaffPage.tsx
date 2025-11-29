@@ -23,6 +23,12 @@ export const StaffPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState<StaffMember | null>(null);
   const [formData, setFormData] = useState<Partial<StaffMember>>({});
+  
+  // Confirmation Modal
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{ isOpen: boolean, staffId: string | null }>({
+      isOpen: false,
+      staffId: null
+  });
 
   const roles = Object.values(StaffRole);
 
@@ -43,9 +49,14 @@ export const StaffPage: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const deleteStaff = (id: string) => {
-    if(window.confirm('Are you sure you want to remove this staff member?')) {
-        setAllStaff(allStaff.filter(s => s.id !== id));
+  const requestDeleteStaff = (id: string) => {
+    setDeleteConfirmation({ isOpen: true, staffId: id });
+  };
+
+  const confirmDeleteStaff = () => {
+    if (deleteConfirmation.staffId) {
+        setAllStaff(allStaff.filter(s => s.id !== deleteConfirmation.staffId));
+        setDeleteConfirmation({ isOpen: false, staffId: null });
     }
   };
 
@@ -98,7 +109,7 @@ export const StaffPage: React.FC = () => {
                 <div key={member.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex flex-col relative group">
                     {/* Delete Icon */}
                     <button 
-                        onClick={() => deleteStaff(member.id)}
+                        onClick={() => requestDeleteStaff(member.id)}
                         className="absolute top-6 right-4 text-gray-300 hover:text-red-500 transition-colors"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -200,6 +211,21 @@ export const StaffPage: React.FC = () => {
               <Button type="submit">Save Details</Button>
             </div>
         </form>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={deleteConfirmation.isOpen}
+        onClose={() => setDeleteConfirmation({ isOpen: false, staffId: null })}
+        title="Confirm Deletion"
+        footer={
+            <>
+                <Button variant="ghost" onClick={() => setDeleteConfirmation({ isOpen: false, staffId: null })}>Cancel</Button>
+                <Button variant="danger" onClick={confirmDeleteStaff}>Delete</Button>
+            </>
+        }
+      >
+          <p className="text-gray-600">Are you sure you want to remove this staff member? This account will no longer be able to log in.</p>
       </Modal>
     </div>
   );
