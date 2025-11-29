@@ -8,31 +8,38 @@ import { Role, Permission, AllPermissions } from '../types.ts';
 export const RoleAccessPage: React.FC = () => {
   const [roles, setRoles] = useState<Role[]>([
     { 
-      id: 'admin', 
+      id: 'super_admin', 
       name: 'Super Admin', 
-      description: 'Full access to all system features. Cannot be edited.', 
+      description: 'Full access to all system features across all branches.', 
       permissions: [...AllPermissions],
-      isSystem: true // Locked role
+      isSystem: true
     },
     { 
-      id: 'manager', 
-      name: 'Branch Manager', 
-      description: 'Can manage branches and staff.', 
-      permissions: ['view dashboard', 'manage staff', 'manage branches'],
+      id: 'branch_admin', 
+      name: 'Branch Admin', 
+      description: 'Full control over a specific branch, including settings and staff.', 
+      permissions: ['view dashboard', 'view orders', 'update orders', 'manage menu', 'manage staff', 'manage branch settings', 'view reports'],
       isSystem: false
     },
     { 
-      id: 'kitchen', 
-      name: 'Kitchen Staff', 
-      description: 'Can only view orders and dashboard.', 
-      permissions: ['view dashboard', 'manage orders' as Permission],
+      id: 'manager', 
+      name: 'Manager', 
+      description: 'Can manage daily operations, menu, and staff.', 
+      permissions: ['view dashboard', 'view orders', 'update orders', 'manage menu', 'manage staff'],
+      isSystem: false
+    },
+    { 
+      id: 'staff', 
+      name: 'Staff', 
+      description: 'Can view and update orders.', 
+      permissions: ['view dashboard', 'view orders', 'update orders'],
       isSystem: false
     },
     {
       id: 'billing',
       name: 'Billing Staff',
-      description: 'Manages payment and reports.',
-      permissions: ['view dashboard', 'view reports', 'manage orders' as Permission],
+      description: 'Handles payments and reports.',
+      permissions: ['view dashboard', 'view orders', 'view reports'],
       isSystem: false
     }
   ]);
@@ -218,24 +225,6 @@ export const RoleAccessPage: React.FC = () => {
                                 key={permission} 
                                 className={`flex items-center p-3 rounded-lg border cursor-pointer transition-all ${isEnabled ? 'bg-orange-50 border-offoOrange' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
                                 onClick={() => togglePermission(permission)}
-                            >
-                                <div className={`w-5 h-5 rounded border flex items-center justify-center mr-3 flex-shrink-0 ${isEnabled ? 'bg-offoOrange border-offoOrange' : 'border-gray-400'}`}>
-                                    {isEnabled && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>}
-                                </div>
-                                <span className={`text-sm select-none ${isEnabled ? 'text-gray-900 font-medium' : 'text-gray-600'}`}>
-                                    {formatPermission(permission)}
-                                </span>
-                            </div>
-                        );
-                    })}
-                     {/* Mocking 'manage orders' since it's not in the main type definition but used in demo data */}
-                    {['manage orders'].map(permission => {
-                         const isEnabled = editingRole?.permissions.includes(permission as Permission);
-                         return (
-                            <div 
-                                key={permission} 
-                                className={`flex items-center p-3 rounded-lg border cursor-pointer transition-all ${isEnabled ? 'bg-orange-50 border-offoOrange' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
-                                onClick={() => togglePermission(permission as Permission)}
                             >
                                 <div className={`w-5 h-5 rounded border flex items-center justify-center mr-3 flex-shrink-0 ${isEnabled ? 'bg-offoOrange border-offoOrange' : 'border-gray-400'}`}>
                                     {isEnabled && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>}

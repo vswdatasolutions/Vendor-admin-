@@ -1,4 +1,5 @@
 
+
 import React, { useState, useMemo } from 'react';
 import Button from '../components/common/Button.tsx';
 import Modal from '../components/common/Modal.tsx';
@@ -10,7 +11,7 @@ export const StaffPage: React.FC = () => {
   const { currentBranchId, currentBranch, branches } = useBranch();
   
   const [allStaff, setAllStaff] = useState<StaffMember[]>([
-    { id: '1', name: 'Sunny Thakur', email: 'sunny@example.com', phone: '+91 9876543210', role: StaffRole.MANAGER, branchId: '1', branchName: 'Main Campus Cafe', isActive: true, lastActivity: new Date('2025-11-28') },
+    { id: '1', name: 'Sunny Thakur', email: 'sunny@example.com', phone: '+91 9876543210', role: StaffRole.BRANCH_ADMIN, branchId: '1', branchName: 'Main Campus Cafe', isActive: true, lastActivity: new Date('2025-11-28') },
     { id: '2', name: 'Ganesh M', email: 'ganesh@example.com', phone: '+91 9988776655', role: StaffRole.KITCHEN, branchId: '1', branchName: 'Main Campus Cafe', isActive: true, lastActivity: new Date('2025-11-28') },
     { id: '3', name: 'Venkateshwara', email: 'venkat@example.com', phone: '+91 9000000000', role: StaffRole.STAFF, branchId: '2', branchName: 'East Wing Coffee Shop', isActive: false, lastActivity: new Date('2025-11-28') },
     { id: '4', name: 'Ramesh B', email: 'ramesh@example.com', phone: '+91 9123456789', role: StaffRole.BILLING, branchId: '1', branchName: 'Main Campus Cafe', isActive: true, lastActivity: new Date('2025-11-28') },
@@ -201,6 +202,7 @@ export const StaffPage: React.FC = () => {
                   <option key={b.id} value={b.id}>{b.name}</option>
               ))}
             </select>
+            <p className="text-xs text-gray-500 mt-1">Select the branch where this staff member will be primarily stationed.</p>
           </div>
           <div className="flex items-center">
             <input type="checkbox" id="isActive" checked={formData.isActive} onChange={e => setFormData({...formData, isActive: e.target.checked})} className="h-4 w-4 text-offoOrange focus:ring-offoOrange border-gray-300 rounded" />

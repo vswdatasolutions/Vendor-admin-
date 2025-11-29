@@ -46,7 +46,8 @@ export interface Branch {
 }
 
 export enum StaffRole {
-  ADMIN = 'Admin',
+  SUPER_ADMIN = 'Super Admin',
+  BRANCH_ADMIN = 'Branch Admin',
   MANAGER = 'Manager',
   STAFF = 'Staff',
   KITCHEN = 'Kitchen Staff',
@@ -55,23 +56,23 @@ export enum StaffRole {
 
 export type Permission = 
   'view dashboard' | 
-  'manage staff' | 
-  'manage branches' | 
-  'view reports' | 
-  'manage branding' | 
-  'manage settings' |
+  'view orders' |
+  'update orders' |
   'manage menu' |
-  'manage orders';
+  'manage staff' | 
+  'manage branch settings' |
+  'view reports' |
+  'manage branding';
 
 export const AllPermissions: Permission[] = [
   'view dashboard',
-  'manage staff',
-  'manage branches',
-  'view reports',
-  'manage branding',
-  'manage settings',
+  'view orders',
+  'update orders',
   'manage menu',
-  'manage orders'
+  'manage staff',
+  'manage branch settings',
+  'view reports',
+  'manage branding'
 ];
 
 export interface StaffMember {
