@@ -68,6 +68,11 @@ export const BranchesPage: React.FC = () => {
       navigate(constants.routes.STAFF);
   };
 
+  const handleViewOrders = (branchId: string) => {
+      setCurrentBranchId(branchId);
+      navigate(constants.routes.ORDERS);
+  };
+
   return (
     <div className="space-y-8">
        {/* Header Section */}
@@ -136,27 +141,38 @@ export const BranchesPage: React.FC = () => {
              </div>
 
              {/* Footer Actions */}
-             <div className="flex items-center gap-3">
+             <div className="grid grid-cols-2 gap-3">
                 <button 
                     onClick={() => openModal(b)}
-                    className="flex-1 px-4 py-1.5 border border-orange-500 text-orange-500 rounded text-sm font-medium hover:bg-orange-50 transition-colors focus:outline-none"
+                    className="w-full px-4 py-2 border border-orange-500 text-orange-500 rounded-lg text-sm font-medium hover:bg-orange-50 transition-colors focus:outline-none"
                 >
                     Edit Details
                 </button>
-                <button 
-                    onClick={() => handleViewStaff(b.id)}
-                    className="flex-1 px-4 py-1.5 border border-blue-500 text-blue-500 rounded text-sm font-medium hover:bg-blue-50 transition-colors focus:outline-none"
-                >
-                    View Staff
-                </button>
-                {b.id !== currentBranchId && (
+                {b.id !== currentBranchId ? (
                     <button 
                         onClick={() => setCurrentBranchId(b.id)}
-                        className="flex-1 px-4 py-1.5 bg-gray-900 text-white rounded text-sm font-medium hover:bg-gray-800 transition-colors"
+                        className="w-full px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
                     >
                         Switch To
                     </button>
+                ) : (
+                    <button disabled className="w-full px-4 py-2 bg-gray-100 text-gray-400 rounded-lg text-sm font-medium cursor-not-allowed border border-gray-200">
+                        Selected
+                    </button>
                 )}
+                
+                <button 
+                    onClick={() => handleViewOrders(b.id)}
+                    className="w-full px-4 py-2 border border-green-500 text-green-500 rounded-lg text-sm font-medium hover:bg-green-50 transition-colors focus:outline-none"
+                >
+                    View Orders
+                </button>
+                <button 
+                    onClick={() => handleViewStaff(b.id)}
+                    className="w-full px-4 py-2 border border-blue-500 text-blue-500 rounded-lg text-sm font-medium hover:bg-blue-50 transition-colors focus:outline-none"
+                >
+                    View Staff
+                </button>
              </div>
           </div>
         ))}
