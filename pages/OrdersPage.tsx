@@ -1,9 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
 import Card from '../components/common/Card.tsx';
 import Button from '../components/common/Button.tsx';
 import Modal from '../components/common/Modal.tsx';
 import { constants } from '../constants.ts';
 import { Order, OrderStatus, OrderItem } from '../types.ts';
+
+// Helper to get today's date in YYYY-MM-DD
+const getTodayDate = () => new Date().toISOString().split('T')[0];
 
 // Mock Data
 const MOCK_ORDERS: Order[] = [
@@ -12,6 +16,7 @@ const MOCK_ORDERS: Order[] = [
     customerName: 'Alice Johnson', 
     totalAmount: 450, 
     status: OrderStatus.INCOMING, 
+    date: getTodayDate(),
     orderTime: '10:45 AM', 
     paymentMethod: 'UPI', 
     items: [
@@ -24,6 +29,7 @@ const MOCK_ORDERS: Order[] = [
     customerName: 'Bob Smith', 
     totalAmount: 850, 
     status: OrderStatus.INCOMING, 
+    date: getTodayDate(),
     orderTime: '10:48 AM', 
     paymentMethod: 'Card', 
     items: [
@@ -35,6 +41,7 @@ const MOCK_ORDERS: Order[] = [
     customerName: 'Karan Mehra', 
     totalAmount: 240, 
     status: OrderStatus.PREPARING, 
+    date: getTodayDate(),
     orderTime: '10:30 AM', 
     paymentMethod: 'Cash', 
     items: [
@@ -46,6 +53,7 @@ const MOCK_ORDERS: Order[] = [
     customerName: 'Charlie Brown', 
     totalAmount: 1200, 
     status: OrderStatus.SCHEDULED, 
+    date: '2023-11-30', // Future date example
     orderTime: '10:00 AM', 
     scheduledTime: '02:00 PM', 
     paymentMethod: 'UPI', 
@@ -58,6 +66,7 @@ const MOCK_ORDERS: Order[] = [
     customerName: 'Sarah Connor', 
     totalAmount: 500, 
     status: OrderStatus.SCHEDULED, 
+    date: '2023-12-01',
     orderTime: '09:30 AM', 
     scheduledTime: '04:30 PM', 
     paymentMethod: 'Card', 
@@ -70,6 +79,7 @@ const MOCK_ORDERS: Order[] = [
     customerName: 'David Lee', 
     totalAmount: 200, 
     status: OrderStatus.CANCELLED, 
+    date: '2023-10-20', // Past date
     orderTime: '09:00 AM', 
     cancellationReason: 'Item Out of Stock', 
     paymentMethod: 'Cash', 
@@ -82,6 +92,7 @@ const MOCK_ORDERS: Order[] = [
     customerName: 'Sita Ram', 
     totalAmount: 150, 
     status: OrderStatus.CANCELLED, 
+    date: getTodayDate(),
     orderTime: '09:15 AM', 
     cancellationReason: 'Customer Request', 
     paymentMethod: 'UPI', 
@@ -98,6 +109,16 @@ export const OrdersPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('live');
   const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
 
+  // Filter State
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterDate, setFilterDate] = useState('');
+  const [minAmount, setMinAmount] = useState<number | ''>('');
+  const [maxAmount, setMaxAmount] = useState<number | ''>('');
+
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
+
   // Confirmation Modal State
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
@@ -105,6 +126,11 @@ export const OrdersPage: React.FC = () => {
     title: string;
     message: string;
   }>({ isOpen: false, action: null, title: '', message: '' });
+
+  // Reset pagination when tab changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, searchQuery, filterDate, minAmount, maxAmount]);
 
   // Simulate Real-time Updates
   useEffect(() => {
@@ -126,6 +152,7 @@ export const OrdersPage: React.FC = () => {
         customerName: customerNames[Math.floor(Math.random() * customerNames.length)],
         totalAmount: randomItem.price,
         status: OrderStatus.INCOMING,
+        date: getTodayDate(),
         orderTime: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
         paymentMethod: Math.random() > 0.5 ? 'UPI' : 'Card',
         items: [
@@ -150,14 +177,37 @@ export const OrdersPage: React.FC = () => {
     return () => clearInterval(intervalId);
   }, []);
 
-  // Filter Logic
-  const liveOrders = orders.filter(o => 
+  // Filter Logic Helper
+  const filterList = (list: Order[]) => {
+    return list.filter(order => {
+      // Name Filter
+      const nameMatch = order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                        order.id.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      // Date Filter
+      const dateMatch = filterDate === '' || order.date === filterDate;
+      
+      // Amount Filter
+      const minMatch = minAmount === '' || order.totalAmount >= minAmount;
+      const maxMatch = maxAmount === '' || order.totalAmount <= maxAmount;
+
+      return nameMatch && dateMatch && minMatch && maxMatch;
+    });
+  };
+
+  // Base Lists (Status based)
+  const liveOrdersBase = orders.filter(o => 
     [OrderStatus.INCOMING, OrderStatus.PENDING, OrderStatus.PREPARING, OrderStatus.READY_FOR_PICKUP].includes(o.status)
   );
-  
-  const scheduledOrders = orders.filter(o => o.status === OrderStatus.SCHEDULED);
-  const rejectedOrders = orders.filter(o => o.status === OrderStatus.CANCELLED);
+  const scheduledOrdersBase = orders.filter(o => o.status === OrderStatus.SCHEDULED);
+  const rejectedOrdersBase = orders.filter(o => o.status === OrderStatus.CANCELLED);
 
+  // Apply User Filters
+  const liveOrders = filterList(liveOrdersBase);
+  const scheduledOrders = filterList(scheduledOrdersBase);
+  const rejectedOrders = filterList(rejectedOrdersBase);
+
+  // For Bulk Actions (Only affect Incoming orders currently visible)
   const incomingOrders = liveOrders.filter(o => o.status === OrderStatus.INCOMING);
 
   // Actions
@@ -197,16 +247,30 @@ export const OrdersPage: React.FC = () => {
   };
 
   const handleConfirmAction = () => {
+    // Collect IDs of currently filtered incoming orders
+    const targetIds = new Set(incomingOrders.map(o => o.id));
+
     if (confirmModal.action === 'accept-all') {
       setOrders(prev => prev.map(o => 
-        o.status === OrderStatus.INCOMING ? { ...o, status: OrderStatus.PREPARING } : o
+        targetIds.has(o.id) && o.status === OrderStatus.INCOMING 
+          ? { ...o, status: OrderStatus.PREPARING } 
+          : o
       ));
     } else if (confirmModal.action === 'reject-all') {
       setOrders(prev => prev.map(o => 
-        o.status === OrderStatus.INCOMING ? { ...o, status: OrderStatus.CANCELLED, cancellationReason: 'Bulk Rejection by Admin' } : o
+        targetIds.has(o.id) && o.status === OrderStatus.INCOMING 
+          ? { ...o, status: OrderStatus.CANCELLED, cancellationReason: 'Bulk Rejection by Admin' } 
+          : o
       ));
     }
     setConfirmModal({ ...confirmModal, isOpen: false });
+  };
+
+  const clearFilters = () => {
+    setSearchQuery('');
+    setFilterDate('');
+    setMinAmount('');
+    setMaxAmount('');
   };
 
   const getStatusColor = (status: OrderStatus) => {
@@ -234,147 +298,193 @@ export const OrdersPage: React.FC = () => {
       return (
         <div className="text-center py-16 bg-white rounded-xl border border-gray-200 border-dashed">
           <p className="text-gray-500 text-lg">{emptyMessage}</p>
+          {(searchQuery || filterDate || minAmount !== '' || maxAmount !== '') && (
+            <button 
+              onClick={clearFilters}
+              className="mt-4 text-offoOrange hover:text-offoOrange-dark font-medium underline"
+            >
+              Clear Filters
+            </button>
+          )}
         </div>
       );
     }
 
+    // Pagination Logic
+    const totalPages = Math.ceil(list.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const currentOrders = list.slice(startIndex, startIndex + itemsPerPage);
+
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 animate-pulse-once">
-        {list.map(order => {
-          const isExpanded = expandedOrders.has(order.id);
-          
-          return (
-            <div 
-              key={order.id} 
-              onClick={() => toggleOrder(order.id)}
-              className={`bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col transition-all duration-200 hover:shadow-md cursor-pointer ${isExpanded ? 'ring-2 ring-offoOrange ring-opacity-50' : ''}`}
-            >
-              {/* Order Header */}
-              <div className="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-start">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-gray-900">{order.id}</span>
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold border uppercase ${getStatusColor(order.status)}`}>
-                      {order.status}
-                    </span>
+      <div className="flex flex-col gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 animate-pulse-once">
+          {currentOrders.map(order => {
+            const isExpanded = expandedOrders.has(order.id);
+            
+            return (
+              <div 
+                key={order.id} 
+                onClick={() => toggleOrder(order.id)}
+                className={`bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col transition-all duration-200 hover:shadow-md cursor-pointer ${isExpanded ? 'ring-2 ring-offoOrange ring-opacity-50' : ''}`}
+              >
+                {/* Order Header */}
+                <div className="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-start">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-gray-900">{order.id}</span>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold border uppercase ${getStatusColor(order.status)}`}>
+                        {order.status}
+                      </span>
+                    </div>
+                    <div className="text-sm text-gray-500 mt-1">{order.customerName}</div>
                   </div>
-                  <div className="text-sm text-gray-500 mt-1">{order.customerName}</div>
-                </div>
-                <div className="text-right flex items-start gap-2">
-                   <div>
-                       <div className="text-xs text-gray-400 font-medium">Placed At</div>
-                       <div className="text-sm font-medium text-gray-700">{order.orderTime}</div>
-                   </div>
-                   <button className="text-gray-400 hover:text-gray-600 transition-colors pt-1">
-                      <svg className={`w-5 h-5 transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                      </svg>
-                   </button>
-                </div>
-              </div>
-
-              {/* Collapsed Summary */}
-              {!isExpanded && (
-                 <div className="p-4 flex justify-between items-center bg-white">
-                    <div className="text-sm text-gray-600 flex items-center gap-2">
-                        <span className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs text-gray-500">
-                           {order.items.length}
-                        </span>
-                        <span className="font-medium truncate max-w-[150px]">{getItemSummary(order.items)}</span>
+                  <div className="text-right flex items-start gap-2">
+                    <div>
+                        <div className="text-xs text-gray-400 font-medium">Placed At</div>
+                        <div className="text-sm font-medium text-gray-700">{order.orderTime}</div>
                     </div>
-                    <span className="font-bold text-gray-900">₹{order.totalAmount}</span>
-                 </div>
-              )}
-
-              {/* Expanded Details */}
-              {isExpanded && (
-                <>
-                  {/* Order Items */}
-                  <div className="p-4 flex-1 overflow-y-auto max-h-96 border-t border-gray-100 bg-white">
-                    <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Order Details</h4>
-                    <ul className="space-y-3">
-                      {order.items.map((item, idx) => (
-                        <li key={idx} className="flex justify-between items-center text-sm border-b border-gray-50 pb-2 last:border-0 last:pb-0">
-                          <div className="flex items-center gap-3">
-                            <span className="w-6 h-6 rounded-full bg-orange-50 text-orange-600 text-xs font-bold flex items-center justify-center border border-orange-100">
-                              {item.quantity}
-                            </span>
-                            <span className="text-gray-800 font-medium">{item.name}</span>
-                          </div>
-                          <span className="text-gray-600 font-medium">₹{item.price * item.quantity}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    
-                    <div className="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center">
-                        <span className="text-sm text-gray-500">Payment: <span className="font-medium text-gray-800">{order.paymentMethod}</span></span>
-                        <span className="text-lg font-bold text-gray-900">Total: ₹{order.totalAmount}</span>
-                    </div>
-
-                    {order.scheduledTime && (
-                       <div className="mt-3 p-2 bg-orange-50 border border-orange-100 rounded-lg text-center">
-                         <span className="text-xs text-orange-600 uppercase font-bold tracking-wide">Scheduled For</span>
-                         <div className="text-lg font-bold text-orange-700">{order.scheduledTime}</div>
-                       </div>
-                    )}
+                    <button className="text-gray-400 hover:text-gray-600 transition-colors pt-1">
+                        <svg className={`w-5 h-5 transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
                   </div>
+                </div>
 
-                  {/* Rejection Reason if cancelled */}
-                  {order.status === OrderStatus.CANCELLED && order.cancellationReason && (
-                    <div className="px-4 py-3 bg-red-50 border-t border-red-100">
-                      <p className="text-sm text-red-600"><strong>Reason:</strong> {order.cancellationReason}</p>
-                    </div>
-                  )}
-
-                  {/* Footer Actions */}
-                  {showActions && order.status !== OrderStatus.CANCELLED && (
-                    <div className="p-4 border-t border-gray-100 bg-gray-50">
-                      <div className="grid grid-cols-2 gap-3">
-                        {order.status === OrderStatus.INCOMING ? (
-                          <>
-                            <button 
-                              onClick={(e) => updateOrderStatus(order.id, OrderStatus.CANCELLED, e)}
-                              className="px-4 py-2 bg-white border border-red-500 text-red-500 rounded-lg hover:bg-red-50 transition-colors text-sm font-medium focus:ring-2 focus:ring-red-200"
-                            >
-                              Reject
-                            </button>
-                            <button 
-                              onClick={(e) => updateOrderStatus(order.id, OrderStatus.PREPARING, e)}
-                              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-medium shadow-sm focus:ring-2 focus:ring-green-300"
-                            >
-                              Accept Order
-                            </button>
-                          </>
-                        ) : order.status === OrderStatus.PREPARING ? (
-                          <button 
-                              onClick={(e) => updateOrderStatus(order.id, OrderStatus.READY_FOR_PICKUP, e)}
-                              className="col-span-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium shadow-sm"
-                            >
-                              Mark Ready for Pickup
-                            </button>
-                        ) : order.status === OrderStatus.READY_FOR_PICKUP ? (
-                          <button 
-                              onClick={(e) => updateOrderStatus(order.id, OrderStatus.COMPLETED, e)}
-                              className="col-span-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors text-sm font-medium shadow-sm"
-                            >
-                              Complete Order
-                            </button>
-                        ) : order.status === OrderStatus.SCHEDULED ? (
-                          <button 
-                              onClick={(e) => updateOrderStatus(order.id, OrderStatus.PREPARING, e)}
-                              className="col-span-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium shadow-sm"
-                            >
-                              Start Preparing Now
-                            </button>
-                        ) : null}
+                {/* Collapsed Summary */}
+                {!isExpanded && (
+                  <div className="p-4 flex justify-between items-center bg-white">
+                      <div className="text-sm text-gray-600 flex items-center gap-2">
+                          <span className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs text-gray-500">
+                            {order.items.length}
+                          </span>
+                          <span className="font-medium truncate max-w-[150px]">{getItemSummary(order.items)}</span>
                       </div>
+                      <span className="font-bold text-gray-900">₹{order.totalAmount}</span>
+                  </div>
+                )}
+
+                {/* Expanded Details */}
+                {isExpanded && (
+                  <>
+                    {/* Order Items */}
+                    <div className="p-4 flex-1 overflow-y-auto max-h-96 border-t border-gray-100 bg-white">
+                      <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Order Details</h4>
+                      <ul className="space-y-3">
+                        {order.items.map((item, idx) => (
+                          <li key={idx} className="flex justify-between items-center text-sm border-b border-gray-50 pb-2 last:border-0 last:pb-0">
+                            <div className="flex items-center gap-3">
+                              <span className="w-6 h-6 rounded-full bg-orange-50 text-orange-600 text-xs font-bold flex items-center justify-center border border-orange-100">
+                                {item.quantity}
+                              </span>
+                              <span className="text-gray-800 font-medium">{item.name}</span>
+                            </div>
+                            <span className="text-gray-600 font-medium">₹{item.price * item.quantity}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      
+                      <div className="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center">
+                          <span className="text-sm text-gray-500">Payment: <span className="font-medium text-gray-800">{order.paymentMethod}</span></span>
+                          <span className="text-lg font-bold text-gray-900">Total: ₹{order.totalAmount}</span>
+                      </div>
+                      
+                      <div className="mt-2 flex justify-between items-center">
+                        <span className="text-xs text-gray-400">Date: {order.date}</span>
+                      </div>
+
+                      {order.scheduledTime && (
+                        <div className="mt-3 p-2 bg-orange-50 border border-orange-100 rounded-lg text-center">
+                          <span className="text-xs text-orange-600 uppercase font-bold tracking-wide">Scheduled For</span>
+                          <div className="text-lg font-bold text-orange-700">{order.scheduledTime}</div>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </>
-              )}
-            </div>
-          );
-        })}
+
+                    {/* Rejection Reason if cancelled */}
+                    {order.status === OrderStatus.CANCELLED && order.cancellationReason && (
+                      <div className="px-4 py-3 bg-red-50 border-t border-red-100">
+                        <p className="text-sm text-red-600"><strong>Reason:</strong> {order.cancellationReason}</p>
+                      </div>
+                    )}
+
+                    {/* Footer Actions */}
+                    {showActions && order.status !== OrderStatus.CANCELLED && (
+                      <div className="p-4 border-t border-gray-100 bg-gray-50">
+                        <div className="grid grid-cols-2 gap-3">
+                          {order.status === OrderStatus.INCOMING ? (
+                            <>
+                              <button 
+                                onClick={(e) => updateOrderStatus(order.id, OrderStatus.CANCELLED, e)}
+                                className="px-4 py-2 bg-white border border-red-500 text-red-500 rounded-lg hover:bg-red-50 transition-colors text-sm font-medium focus:ring-2 focus:ring-red-200"
+                              >
+                                Reject
+                              </button>
+                              <button 
+                                onClick={(e) => updateOrderStatus(order.id, OrderStatus.PREPARING, e)}
+                                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-medium shadow-sm focus:ring-2 focus:ring-green-300"
+                              >
+                                Accept Order
+                              </button>
+                            </>
+                          ) : order.status === OrderStatus.PREPARING ? (
+                            <button 
+                                onClick={(e) => updateOrderStatus(order.id, OrderStatus.READY_FOR_PICKUP, e)}
+                                className="col-span-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium shadow-sm"
+                              >
+                                Mark Ready for Pickup
+                              </button>
+                          ) : order.status === OrderStatus.READY_FOR_PICKUP ? (
+                            <button 
+                                onClick={(e) => updateOrderStatus(order.id, OrderStatus.COMPLETED, e)}
+                                className="col-span-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors text-sm font-medium shadow-sm"
+                              >
+                                Complete Order
+                              </button>
+                          ) : order.status === OrderStatus.SCHEDULED ? (
+                            <button 
+                                onClick={(e) => updateOrderStatus(order.id, OrderStatus.PREPARING, e)}
+                                className="col-span-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium shadow-sm"
+                              >
+                                Start Preparing Now
+                              </button>
+                          ) : null}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center mt-4 gap-4 pb-4">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className={currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}
+            >
+              Previous
+            </Button>
+            <span className="text-sm font-medium text-gray-600">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className={currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}
+            >
+              Next
+            </Button>
+          </div>
+        )}
       </div>
     );
   };
@@ -400,6 +510,66 @@ export const OrdersPage: React.FC = () => {
            </div>
         )}
       </div>
+
+      {/* Filter Bar */}
+      <Card className="p-4 bg-gray-50 border border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+          <div className="col-span-1 lg:col-span-2">
+             <label className="block text-xs font-medium text-gray-500 mb-1">Customer Name or ID</label>
+             <div className="relative">
+                <input 
+                  type="text" 
+                  placeholder="Search by name or order ID..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-offoOrange focus:border-offoOrange"
+                />
+                <svg className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+             </div>
+          </div>
+          <div>
+             <label className="block text-xs font-medium text-gray-500 mb-1">Filter by Date</label>
+             <input 
+               type="date" 
+               value={filterDate}
+               onChange={(e) => setFilterDate(e.target.value)}
+               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-offoOrange focus:border-offoOrange"
+             />
+          </div>
+          <div className="flex gap-2">
+            <div className="w-1/2">
+                <label className="block text-xs font-medium text-gray-500 mb-1">Min ₹</label>
+                <input 
+                  type="number" 
+                  placeholder="0" 
+                  value={minAmount}
+                  onChange={(e) => setMinAmount(e.target.value === '' ? '' : Number(e.target.value))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-offoOrange focus:border-offoOrange"
+                />
+            </div>
+            <div className="w-1/2">
+                <label className="block text-xs font-medium text-gray-500 mb-1">Max ₹</label>
+                <input 
+                  type="number" 
+                  placeholder="∞" 
+                  value={maxAmount}
+                  onChange={(e) => setMaxAmount(e.target.value === '' ? '' : Number(e.target.value))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-offoOrange focus:border-offoOrange"
+                />
+            </div>
+          </div>
+          <div className="flex">
+             <button 
+               onClick={clearFilters}
+               className="w-full px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+             >
+                Clear Filters
+             </button>
+          </div>
+        </div>
+      </Card>
 
       {/* Tabs */}
       <div className="border-b border-gray-200">
@@ -456,9 +626,9 @@ export const OrdersPage: React.FC = () => {
 
       {/* Content Area */}
       <div>
-        {activeTab === 'live' && renderOrderList(liveOrders, 'No active orders at the moment.')}
-        {activeTab === 'scheduled' && renderOrderList(scheduledOrders, 'No scheduled orders.')}
-        {activeTab === 'rejects' && renderOrderList(rejectedOrders, 'No rejected orders found.', false)}
+        {activeTab === 'live' && renderOrderList(liveOrders, 'No active orders matching your filters.')}
+        {activeTab === 'scheduled' && renderOrderList(scheduledOrders, 'No scheduled orders matching your filters.')}
+        {activeTab === 'rejects' && renderOrderList(rejectedOrders, 'No rejected orders matching your filters.', false)}
       </div>
 
       {/* Confirmation Modal */}

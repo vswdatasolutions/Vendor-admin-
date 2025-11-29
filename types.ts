@@ -1,3 +1,4 @@
+
 export enum OrderStatus {
   INCOMING = 'Incoming',
   PENDING = 'Pending',
@@ -21,6 +22,7 @@ export interface Order {
   totalAmount: number;
   status: OrderStatus;
   items: OrderItem[];
+  date: string; // YYYY-MM-DD format
   orderTime: string;
   pickupTime?: string;
   scheduledTime?: string;

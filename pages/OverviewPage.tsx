@@ -11,11 +11,49 @@ export const OverviewPage: React.FC = () => {
     { title: 'Revenue', value: '₹12,450', icon: '💰' },
   ];
 
+  const getTodayDate = () => new Date().toISOString().split('T')[0];
+
   const recentOrders: Order[] = [
-    { id: 'ORD-001', customerName: 'Rahul Kumar', totalAmount: 450, status: OrderStatus.PREPARING, items: [], orderTime: '10:30 AM', paymentMethod: 'UPI' },
-    { id: 'ORD-002', customerName: 'Priya Sharma', totalAmount: 120, status: OrderStatus.READY_FOR_PICKUP, items: [], orderTime: '10:15 AM', paymentMethod: 'Cash' },
-    { id: 'ORD-003', customerName: 'Amit Singh', totalAmount: 850, status: OrderStatus.COMPLETED, items: [], orderTime: '09:45 AM', paymentMethod: 'Card' },
-    { id: 'ORD-004', customerName: 'Sneha Gupta', totalAmount: 200, status: OrderStatus.PENDING, items: [], orderTime: '10:35 AM', paymentMethod: 'UPI' },
+    { 
+      id: 'ORD-001', 
+      customerName: 'Rahul Kumar', 
+      totalAmount: 450, 
+      status: OrderStatus.PREPARING, 
+      items: [], 
+      orderTime: '10:30 AM', 
+      paymentMethod: 'UPI',
+      date: getTodayDate() 
+    },
+    { 
+      id: 'ORD-002', 
+      customerName: 'Priya Sharma', 
+      totalAmount: 120, 
+      status: OrderStatus.READY_FOR_PICKUP, 
+      items: [], 
+      orderTime: '10:15 AM', 
+      paymentMethod: 'Cash',
+      date: getTodayDate() 
+    },
+    { 
+      id: 'ORD-003', 
+      customerName: 'Amit Singh', 
+      totalAmount: 850, 
+      status: OrderStatus.COMPLETED, 
+      items: [], 
+      orderTime: '09:45 AM', 
+      paymentMethod: 'Card',
+      date: getTodayDate() 
+    },
+    { 
+      id: 'ORD-004', 
+      customerName: 'Sneha Gupta', 
+      totalAmount: 200, 
+      status: OrderStatus.PENDING, 
+      items: [], 
+      orderTime: '10:35 AM', 
+      paymentMethod: 'UPI',
+      date: getTodayDate() 
+    },
   ];
 
   const getStatusBadgeClasses = (status: OrderStatus) => {

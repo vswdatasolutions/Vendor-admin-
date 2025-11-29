@@ -1,10 +1,13 @@
 import React from 'react';
-import { constants } from '../../constants.ts';
 
-const LoadingSpinner: React.FC = () => {
+interface LoadingSpinnerProps {
+  className?: string;
+}
+
+const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ className }) => {
   return (
-    <div className="flex justify-center items-center">
-      <div className={`animate-spin rounded-full h-8 w-8 border-b-2 border-${constants.colors.PRIMARY}`}></div>
+    <div className={`flex justify-center items-center ${className || ''}`}>
+      <div className="animate-spin rounded-full h-5 w-5 border-2 border-current border-t-transparent"></div>
     </div>
   );
 };
