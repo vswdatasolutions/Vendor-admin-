@@ -226,10 +226,11 @@ export const OrdersPage: React.FC = () => {
   };
 
   const toggleSelectAll = () => {
-    if (selectedOrderIds.size === currentOrders.length && currentOrders.length > 0) {
+    // Select ALL filtered orders, not just the current page
+    if (selectedOrderIds.size === filteredOrders.length && filteredOrders.length > 0) {
         setSelectedOrderIds(new Set());
     } else {
-        setSelectedOrderIds(new Set(currentOrders.map(o => o.id)));
+        setSelectedOrderIds(new Set(filteredOrders.map(o => o.id)));
     }
   };
 
@@ -318,7 +319,7 @@ export const OrdersPage: React.FC = () => {
                         <th scope="col" className="px-6 py-4 text-left">
                             <input 
                                 type="checkbox" 
-                                checked={selectedOrderIds.size === currentOrders.length && currentOrders.length > 0}
+                                checked={filteredOrders.length > 0 && selectedOrderIds.size === filteredOrders.length}
                                 onChange={toggleSelectAll}
                                 className="h-5 w-5 text-offoOrange border-gray-300 rounded focus:ring-offoOrange cursor-pointer"
                             />
