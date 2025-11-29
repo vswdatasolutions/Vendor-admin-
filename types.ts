@@ -1,7 +1,8 @@
 
+
 export enum OrderStatus {
   INCOMING = 'Incoming',
-  PENDING = 'Pending',
+  PENDING = 'Pending', // Treated as Incoming usually
   PREPARING = 'Preparing',
   READY_FOR_PICKUP = 'Ready for Pickup',
   SCHEDULED = 'Scheduled',
@@ -18,10 +19,13 @@ export interface OrderItem {
 
 export interface Order {
   id: string;
+  branchId: string; // Added branchId
   customerName: string;
+  address?: string; // Added address for UI
   totalAmount: number;
   status: OrderStatus;
   items: OrderItem[];
+  itemImage?: string; // Added for UI preview
   date: string; // YYYY-MM-DD format
   orderTime: string;
   pickupTime?: string;
@@ -55,7 +59,9 @@ export type Permission =
   'manage branches' | 
   'view reports' | 
   'manage branding' | 
-  'manage settings';
+  'manage settings' |
+  'manage menu' |
+  'manage orders';
 
 export const AllPermissions: Permission[] = [
   'view dashboard',
@@ -64,6 +70,8 @@ export const AllPermissions: Permission[] = [
   'view reports',
   'manage branding',
   'manage settings',
+  'manage menu',
+  'manage orders'
 ];
 
 export interface StaffMember {
@@ -77,6 +85,25 @@ export interface StaffMember {
   isActive: boolean;
   password?: string;
   lastActivity?: Date;
+}
+
+export interface MenuCategory {
+  id: string;
+  name: string;
+  description?: string;
+  branchId: string;
+}
+
+export interface MenuItem {
+  id: string;
+  categoryId: string;
+  branchId: string;
+  name: string;
+  description: string;
+  price: number;
+  isVeg: boolean;
+  isAvailable: boolean;
+  imageUrl?: string;
 }
 
 export interface SalesDataPoint {

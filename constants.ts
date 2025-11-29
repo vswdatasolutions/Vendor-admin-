@@ -1,8 +1,10 @@
+
 export const constants = {
   routes: {
     LOGIN: '/login',
     OVERVIEW: '/overview',
     ORDERS: '/orders',
+    MENU: '/menu',
     BRANCHES: '/branches',
     STAFF: '/staff',
     ROLE_ACCESS: '/roles-access',

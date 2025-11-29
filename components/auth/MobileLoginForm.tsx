@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import Button from '../common/Button.tsx';
 import LoadingSpinner from '../common/LoadingSpinner.tsx';
@@ -12,9 +13,17 @@ const MobileLoginForm: React.FC<MobileLoginFormProps> = ({ onLogin }) => {
   const [otp, setOtp] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [otpSent, setOtpSent] = useState<boolean>(false);
+  const [step, setStep] = useState<1 | 2 | 3>(1); // 1: Mobile, 2: OTP, 3: Branch Select
   const [otpCooldown, setOtpCooldown] = useState<number>(0);
   const otpCooldownRef = useRef<number | null>(null);
+  
+  // Mock User Branches
+  const [userBranches] = useState([
+    { id: '1', name: 'Main Campus Cafe' },
+    { id: '2', name: 'East Wing Coffee Shop' },
+    { id: '3', name: 'Downtown Hub' }
+  ]);
+  const [selectedBranchId, setSelectedBranchId] = useState<string>('1');
 
   useEffect(() => {
     if (otpCooldown > 0) {
@@ -41,7 +50,7 @@ const MobileLoginForm: React.FC<MobileLoginFormProps> = ({ onLogin }) => {
     }
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      setOtpSent(true);
+      setStep(2);
       setOtpCooldown(60);
       setError(null);
     } catch (apiError) {
@@ -62,7 +71,12 @@ const MobileLoginForm: React.FC<MobileLoginFormProps> = ({ onLogin }) => {
     }
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      onLogin(true);
+      // In a real app, response would contain available branches
+      if (userBranches.length > 1) {
+          setStep(3); // Go to branch selection
+      } else {
+          onLogin(true); // Direct login if only 1 branch
+      }
     } catch (apiError) {
       setError('Failed to verify OTP.');
     } finally {
@@ -70,16 +84,23 @@ const MobileLoginForm: React.FC<MobileLoginFormProps> = ({ onLogin }) => {
     }
   };
 
+  const handleBranchSelect = (e: React.FormEvent) => {
+      e.preventDefault();
+      // In a real app, you would set the global context here or store token
+      // For this demo, we assume App.tsx sets up default or we pass it up
+      onLogin(true);
+  }
+
   return (
     <div className="bg-white">
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">
-          {otpSent ? 'Verify OTP' : 'Welcome Back'}
+          {step === 1 ? 'Welcome Back' : step === 2 ? 'Verify OTP' : 'Select Branch'}
         </h2>
         <p className="text-gray-500">
-          {otpSent 
-            ? `Enter the code sent to ${mobileNumber}` 
-            : 'Enter your mobile number to access your dashboard.'}
+          {step === 1 ? 'Enter your mobile number to access your dashboard.' : 
+           step === 2 ? `Enter the code sent to ${mobileNumber}` : 
+           'Choose the branch you want to manage.'}
         </p>
       </div>
 
@@ -90,7 +111,7 @@ const MobileLoginForm: React.FC<MobileLoginFormProps> = ({ onLogin }) => {
         </div>
       )}
 
-      {!otpSent ? (
+      {step === 1 && (
         <form onSubmit={handleSendOTP} className="space-y-6">
           <div>
             <label htmlFor="mobileNumber" className="block text-sm font-semibold text-gray-700 mb-2">Mobile Number</label>
@@ -113,12 +134,14 @@ const MobileLoginForm: React.FC<MobileLoginFormProps> = ({ onLogin }) => {
             {loading ? <LoadingSpinner /> : 'Get OTP'}
           </Button>
         </form>
-      ) : (
+      )}
+
+      {step === 2 && (
         <form onSubmit={handleVerifyOTP} className="space-y-6">
           <div>
             <div className="flex justify-between items-center mb-2">
                 <label htmlFor="otp" className="block text-sm font-semibold text-gray-700">One-Time Password</label>
-                <button type="button" onClick={() => { setOtpSent(false); setOtp(''); }} className="text-sm text-offoOrange hover:text-offoOrange-dark font-medium transition-colors">Change Number?</button>
+                <button type="button" onClick={() => { setStep(1); setOtp(''); }} className="text-sm text-offoOrange hover:text-offoOrange-dark font-medium transition-colors">Change Number?</button>
             </div>
             <input 
                 type="text" 
@@ -149,6 +172,34 @@ const MobileLoginForm: React.FC<MobileLoginFormProps> = ({ onLogin }) => {
               {otpCooldown > 0 ? `Resend available in ${otpCooldown}s` : 'Resend OTP'}
             </Button>
           </div>
+        </form>
+      )}
+
+      {step === 3 && (
+        <form onSubmit={handleBranchSelect} className="space-y-6 animate-modal-in">
+           <div>
+               <label className="block text-sm font-semibold text-gray-700 mb-4">Available Branches</label>
+               <div className="space-y-3">
+                   {userBranches.map(branch => (
+                       <label key={branch.id} className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all ${selectedBranchId === branch.id ? 'border-offoOrange bg-orange-50 ring-1 ring-offoOrange' : 'border-gray-200 hover:border-gray-300'}`}>
+                           <input 
+                                type="radio" 
+                                name="branch" 
+                                value={branch.id} 
+                                checked={selectedBranchId === branch.id}
+                                onChange={() => setSelectedBranchId(branch.id)}
+                                className="h-5 w-5 text-offoOrange focus:ring-offoOrange border-gray-300"
+                           />
+                           <span className={`ml-3 font-medium ${selectedBranchId === branch.id ? 'text-gray-900' : 'text-gray-600'}`}>
+                               {branch.name}
+                           </span>
+                       </label>
+                   ))}
+               </div>
+           </div>
+           <Button type="submit" variant="primary" className="w-full py-3.5 text-lg shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40">
+             Continue to Dashboard
+           </Button>
         </form>
       )}
     </div>

@@ -1,15 +1,14 @@
+
 import React, { useState } from 'react';
 import Card from '../components/common/Card.tsx';
 import Button from '../components/common/Button.tsx';
 import Modal from '../components/common/Modal.tsx';
 import { constants } from '../constants.ts';
 import { Branch } from '../types.ts';
+import { useBranch } from '../context/BranchContext.tsx';
 
 export const BranchesPage: React.FC = () => {
-  const [branches, setBranches] = useState<Branch[]>([
-    { id: '1', name: 'Main campus Cafes', address: 'Amazon Building A, Tech Park', status: 'Active', manager: 'Vinod More', contact: '+91 96985965', latitude: '12.9716', longitude: '77.5946' },
-    { id: '2', name: 'East Wing Coffee Shop', address: 'Amazon Building A, Tech Park', status: 'Active', manager: 'Jan Smith', contact: '+91 96985965', latitude: '12.9345', longitude: '77.6291' }
-  ]);
+  const { branches, setBranches, currentBranchId, setCurrentBranchId } = useBranch();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBranch, setEditingBranch] = useState<Branch | null>(null);
@@ -27,6 +26,15 @@ export const BranchesPage: React.FC = () => {
   };
 
   const deleteBranch = (id: string) => {
+    if (branches.length <= 1) {
+        alert("You cannot delete the only remaining branch.");
+        return;
+    }
+    if (id === currentBranchId) {
+        alert("You cannot delete the currently selected branch. Please switch branches first.");
+        return;
+    }
+
     if(window.confirm('Are you sure you want to delete this branch?')) {
         setBranches(branches.filter(b => b.id !== id));
     }
@@ -49,8 +57,7 @@ export const BranchesPage: React.FC = () => {
        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Branch Management</h1>
-          <p className="text-gray-500 mt-1 text-sm">Manage Your Cafe Location and details.</p>
-          <p className="text-gray-400 text-xs mt-1">Manage Cafes/Branches</p>
+          <p className="text-gray-500 mt-1 text-sm">Manage your Cafe Locations and details.</p>
         </div>
         <button 
             onClick={() => openModal()} 
@@ -63,17 +70,20 @@ export const BranchesPage: React.FC = () => {
       {/* Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
         {branches.map(b => (
-          <div key={b.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex flex-col">
+          <div key={b.id} className={`bg-white rounded-xl p-6 shadow-sm border flex flex-col transition-all ${b.id === currentBranchId ? 'border-offoOrange ring-1 ring-offoOrange bg-orange-50/10' : 'border-gray-100'}`}>
              {/* Card Header */}
              <div className="flex justify-between items-start mb-6">
                 <div className="flex gap-4">
-                    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 text-blue-500">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${b.id === currentBranchId ? 'bg-orange-100 text-offoOrange' : 'bg-blue-100 text-blue-500'}`}>
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m-1 4h1m-1 4h1" />
                         </svg>
                     </div>
                     <div>
-                        <h3 className="text-lg font-bold text-gray-900 leading-tight">{b.name}</h3>
+                        <div className="flex items-center gap-2">
+                             <h3 className="text-lg font-bold text-gray-900 leading-tight">{b.name}</h3>
+                             {b.id === currentBranchId && <span className="text-[10px] bg-offoOrange text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Current</span>}
+                        </div>
                         <p className="text-gray-500 text-sm mt-1">{b.address}</p>
                     </div>
                 </div>
@@ -81,7 +91,7 @@ export const BranchesPage: React.FC = () => {
                     <span className={`px-3 py-1 rounded-full text-xs font-medium text-white ${b.status === 'Active' ? 'bg-green-500' : 'bg-red-500'}`}>
                         {b.status}
                     </span>
-                    <button onClick={() => deleteBranch(b.id)} className="text-gray-400 hover:text-red-500 transition-colors">
+                    <button onClick={() => deleteBranch(b.id)} className="text-gray-400 hover:text-red-500 transition-colors" title="Delete Branch">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
@@ -104,7 +114,7 @@ export const BranchesPage: React.FC = () => {
                 </div>
                 <div className="flex justify-between items-center text-sm">
                     <span className="font-semibold text-gray-900">Location:</span>
-                    <span className="text-gray-500">{b.latitude}, {b.longitude}</span>
+                    <span className="text-gray-500 truncate max-w-[200px]">{b.latitude}, {b.longitude}</span>
                 </div>
              </div>
 
@@ -112,20 +122,18 @@ export const BranchesPage: React.FC = () => {
              <div className="flex items-center gap-3">
                 <button 
                     onClick={() => openModal(b)}
-                    className="px-6 py-1.5 border border-orange-500 text-orange-500 rounded text-sm font-medium hover:bg-orange-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-orange-500"
+                    className="flex-1 px-4 py-1.5 border border-orange-500 text-orange-500 rounded text-sm font-medium hover:bg-orange-50 transition-colors focus:outline-none"
                 >
-                    Edit
+                    Edit Details
                 </button>
-                <button className="p-2 text-gray-600 hover:bg-gray-100 rounded transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                </button>
-                <button className="p-2 text-gray-600 hover:bg-gray-100 rounded transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                    </svg>
-                </button>
+                {b.id !== currentBranchId && (
+                    <button 
+                        onClick={() => setCurrentBranchId(b.id)}
+                        className="flex-1 px-4 py-1.5 bg-gray-900 text-white rounded text-sm font-medium hover:bg-gray-800 transition-colors"
+                    >
+                        Switch To
+                    </button>
+                )}
              </div>
           </div>
         ))}

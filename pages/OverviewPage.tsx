@@ -1,60 +1,57 @@
-import React from 'react';
+
+import React, { useMemo } from 'react';
 import Card from '../components/common/Card.tsx';
 import { constants } from '../constants.ts';
 import { Order, OrderStatus } from '../types.ts';
+import { useBranch } from '../context/BranchContext.tsx';
 
 export const OverviewPage: React.FC = () => {
-  const stats = [
-    { title: 'Today Orders', value: 24, icon: '📦' },
-    { title: 'Pending', value: 3, icon: '⏳' },
-    { title: 'Preparing', value: 5, icon: '🍳' },
-    { title: 'Revenue', value: '₹12,450', icon: '💰' },
-  ];
-
+  const { currentBranchId, currentBranch } = useBranch();
+  
   const getTodayDate = () => new Date().toISOString().split('T')[0];
 
-  const recentOrders: Order[] = [
+  // Mock data with branchId
+  const allRecentOrders: Order[] = [
     { 
-      id: 'ORD-001', 
-      customerName: 'Rahul Kumar', 
-      totalAmount: 450, 
-      status: OrderStatus.PREPARING, 
-      items: [], 
-      orderTime: '10:30 AM', 
-      paymentMethod: 'UPI',
-      date: getTodayDate() 
+      id: 'ORD-001', branchId: '1', customerName: 'Rahul Kumar', totalAmount: 450, status: OrderStatus.PREPARING, items: [], orderTime: '10:30 AM', paymentMethod: 'UPI', date: getTodayDate() 
     },
     { 
-      id: 'ORD-002', 
-      customerName: 'Priya Sharma', 
-      totalAmount: 120, 
-      status: OrderStatus.READY_FOR_PICKUP, 
-      items: [], 
-      orderTime: '10:15 AM', 
-      paymentMethod: 'Cash',
-      date: getTodayDate() 
+      id: 'ORD-002', branchId: '2', customerName: 'Priya Sharma', totalAmount: 120, status: OrderStatus.READY_FOR_PICKUP, items: [], orderTime: '10:15 AM', paymentMethod: 'Cash', date: getTodayDate() 
     },
     { 
-      id: 'ORD-003', 
-      customerName: 'Amit Singh', 
-      totalAmount: 850, 
-      status: OrderStatus.COMPLETED, 
-      items: [], 
-      orderTime: '09:45 AM', 
-      paymentMethod: 'Card',
-      date: getTodayDate() 
+      id: 'ORD-003', branchId: '1', customerName: 'Amit Singh', totalAmount: 850, status: OrderStatus.COMPLETED, items: [], orderTime: '09:45 AM', paymentMethod: 'Card', date: getTodayDate() 
     },
     { 
-      id: 'ORD-004', 
-      customerName: 'Sneha Gupta', 
-      totalAmount: 200, 
-      status: OrderStatus.PENDING, 
-      items: [], 
-      orderTime: '10:35 AM', 
-      paymentMethod: 'UPI',
-      date: getTodayDate() 
+      id: 'ORD-004', branchId: '3', customerName: 'Sneha Gupta', totalAmount: 200, status: OrderStatus.PENDING, items: [], orderTime: '10:35 AM', paymentMethod: 'UPI', date: getTodayDate() 
+    },
+    { 
+      id: 'ORD-005', branchId: '1', customerName: 'John Doe', totalAmount: 1200, status: OrderStatus.INCOMING, items: [], orderTime: '11:00 AM', paymentMethod: 'Card', date: getTodayDate() 
     },
   ];
+
+  // Filter orders by branch
+  const recentOrders = useMemo(() => 
+    allRecentOrders.filter(o => o.branchId === currentBranchId), 
+  [currentBranchId]);
+
+  // Calculate dynamic stats based on filtered orders
+  const stats = useMemo(() => {
+     // Mock stats logic
+     const count = recentOrders.length;
+     const revenue = recentOrders.reduce((acc, curr) => acc + curr.totalAmount, 0);
+     const active = recentOrders.filter(o => o.status === OrderStatus.INCOMING || o.status === OrderStatus.PREPARING || o.status === OrderStatus.PENDING).length;
+     const preparing = recentOrders.filter(o => o.status === OrderStatus.PREPARING).length;
+
+     // Base values + dynamic modification to look like a real dashboard
+     const baseToday = currentBranchId === '1' ? 24 : currentBranchId === '2' ? 18 : 12;
+     
+     return [
+        { title: 'Today Orders', value: baseToday + count, icon: '📦' },
+        { title: 'Active Orders', value: active + (currentBranchId === '1' ? 5 : 2), icon: '🔥' },
+        { title: 'Preparing', value: preparing + (currentBranchId === '1' ? 3 : 1), icon: '🍳' },
+        { title: 'Revenue', value: `₹${(revenue + (currentBranchId === '1' ? 12000 : 5000)).toLocaleString()}`, icon: '💰' },
+     ];
+  }, [recentOrders, currentBranchId]);
 
   const getStatusBadgeClasses = (status: OrderStatus) => {
     const base = 'px-2 py-1 rounded-full text-xs font-medium';
@@ -68,13 +65,23 @@ export const OverviewPage: React.FC = () => {
     }
   };
 
-  // Simulated chart data
-  const weeklyData = [40, 65, 45, 80, 55, 90, 70];
+  // Simulated chart data depending on branch
+  const weeklyData = currentBranchId === '1' 
+    ? [40, 65, 45, 80, 55, 90, 70] 
+    : currentBranchId === '2' 
+        ? [30, 40, 35, 50, 45, 60, 50] 
+        : [15, 20, 25, 18, 30, 35, 28];
+  
   const maxVal = Math.max(...weeklyData);
 
   return (
     <div className="space-y-6">
-      <h1 className={`text-3xl font-bold text-${constants.colors.TEXT_DARK} mb-6`}>Dashboard Overview</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+         <div>
+             <h1 className={`text-3xl font-bold text-${constants.colors.TEXT_DARK}`}>Dashboard</h1>
+             <p className="text-gray-500 mt-1">Overview for <span className="font-semibold text-offoOrange">{currentBranch?.name}</span></p>
+         </div>
+      </div>
       
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -142,7 +149,7 @@ export const OverviewPage: React.FC = () => {
 
       {/* Recent Orders */}
       <Card className="p-6">
-        <h3 className="text-lg font-bold text-gray-800 mb-4">Recent Orders</h3>
+        <h3 className="text-lg font-bold text-gray-800 mb-4">Recent Orders ({currentBranch?.name})</h3>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -156,7 +163,7 @@ export const OverviewPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {recentOrders.map((order) => (
+              {recentOrders.length > 0 ? recentOrders.map((order) => (
                 <tr key={order.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.customerName}</td>
@@ -167,7 +174,13 @@ export const OverviewPage: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.paymentMethod}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.orderTime}</td>
                 </tr>
-              ))}
+              )) : (
+                  <tr>
+                      <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                          No recent orders found for this branch.
+                      </td>
+                  </tr>
+              )}
             </tbody>
           </table>
         </div>

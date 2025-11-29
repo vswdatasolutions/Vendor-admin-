@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthScreen } from './components/auth/AuthScreen.tsx';
@@ -10,7 +11,9 @@ import { BrandingPage } from './pages/BrandingPage.tsx';
 import { SettingsPage } from './pages/SettingsPage.tsx';
 import { BranchesPage } from './pages/BranchesPage.tsx';
 import { OrdersPage } from './pages/OrdersPage.tsx';
+import { MenuPage } from './pages/MenuPage.tsx';
 import { constants } from './constants.ts';
+import { BranchProvider } from './context/BranchContext.tsx';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -30,19 +33,22 @@ const App: React.FC = () => {
           path="*"
           element={
             isAuthenticated ? (
-              <MainLayout onLogout={() => setIsAuthenticated(false)}>
-                <Routes>
-                  <Route path={constants.routes.OVERVIEW} element={<OverviewPage />} />
-                  <Route path={constants.routes.ORDERS} element={<OrdersPage />} />
-                  <Route path={constants.routes.BRANCHES} element={<BranchesPage />} />
-                  <Route path={constants.routes.STAFF} element={<StaffPage />} />
-                  <Route path={constants.routes.ROLE_ACCESS} element={<RoleAccessPage />} />
-                  <Route path={constants.routes.REPORTS} element={<ReportsPage />} />
-                  <Route path={constants.routes.BRANDING} element={<BrandingPage />} />
-                  <Route path={constants.routes.SETTINGS} element={<SettingsPage />} />
-                  <Route path="/" element={<Navigate to={constants.routes.OVERVIEW} replace />} />
-                </Routes>
-              </MainLayout>
+              <BranchProvider>
+                <MainLayout onLogout={() => setIsAuthenticated(false)}>
+                  <Routes>
+                    <Route path={constants.routes.OVERVIEW} element={<OverviewPage />} />
+                    <Route path={constants.routes.ORDERS} element={<OrdersPage />} />
+                    <Route path={constants.routes.MENU} element={<MenuPage />} />
+                    <Route path={constants.routes.BRANCHES} element={<BranchesPage />} />
+                    <Route path={constants.routes.STAFF} element={<StaffPage />} />
+                    <Route path={constants.routes.ROLE_ACCESS} element={<RoleAccessPage />} />
+                    <Route path={constants.routes.REPORTS} element={<ReportsPage />} />
+                    <Route path={constants.routes.BRANDING} element={<BrandingPage />} />
+                    <Route path={constants.routes.SETTINGS} element={<SettingsPage />} />
+                    <Route path="/" element={<Navigate to={constants.routes.OVERVIEW} replace />} />
+                  </Routes>
+                </MainLayout>
+              </BranchProvider>
             ) : (
               <Navigate to={constants.routes.LOGIN} replace />
             )
