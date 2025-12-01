@@ -1,5 +1,4 @@
 
-
 import React, { useState, useMemo } from 'react';
 import Card from '../components/common/Card.tsx';
 import Button from '../components/common/Button.tsx';
@@ -12,22 +11,62 @@ export const MenuPage: React.FC = () => {
   const { currentBranch, currentBranchId } = useBranch();
 
   const [categories, setCategories] = useState<MenuCategory[]>([
+    // Branch 1: Main Campus Cafe
     { id: 'cat1', name: 'Starters', branchId: '1' },
     { id: 'cat2', name: 'Main Course', branchId: '1' },
     { id: 'cat3', name: 'Beverages', branchId: '1' },
     { id: 'cat4', name: 'Desserts', branchId: '1' },
+    
+    // Branch 2: East Wing Coffee Shop
     { id: 'cat5', name: 'Coffee Specials', branchId: '2' },
-    { id: 'cat6', name: 'Snacks', branchId: '2' },
-    { id: 'cat7', name: 'Combos', branchId: '3' },
+    { id: 'cat6', name: 'Snacks & Bakery', branchId: '2' },
+    { id: 'cat7', name: 'Iced Drinks', branchId: '2' },
+
+    // Branch 3: Downtown Hub
+    { id: 'cat8', name: 'Combos', branchId: '3' },
+    { id: 'cat9', name: 'Pizzas', branchId: '3' },
+    { id: 'cat10', name: 'Burgers', branchId: '3' },
+
+    // Branch 4: Westside Food Court
+    { id: 'cat11', name: 'Asian Corner', branchId: '4' },
+    { id: 'cat12', name: 'Street Food', branchId: '4' },
+    { id: 'cat13', name: 'Healthy Bowls', branchId: '4' },
+
+    // Branch 5: Airport Transit Cafe
+    { id: 'cat14', name: 'Grab & Go', branchId: '5' },
+    { id: 'cat15', name: 'Hot Beverages', branchId: '5' }
   ]);
 
   const [items, setItems] = useState<MenuItem[]>([
-    { id: '1', categoryId: 'cat1', branchId: '1', name: 'Paneer Tikka', description: 'Spicy paneer cubes', price: 250, isVeg: true, isAvailable: true },
-    { id: '2', categoryId: 'cat2', branchId: '1', name: 'Chicken Biryani', description: 'Hyderabadi style', price: 350, isVeg: false, isAvailable: true },
-    { id: '3', categoryId: 'cat3', branchId: '1', name: 'Cold Coffee', description: 'With chocolate syrup', price: 120, isVeg: true, isAvailable: false },
-    { id: '4', categoryId: 'cat5', branchId: '2', name: 'Cappuccino', description: 'Strong brewed coffee', price: 150, isVeg: true, isAvailable: true },
-    { id: '5', categoryId: 'cat6', branchId: '2', name: 'Club Sandwich', description: 'Grilled with veggies', price: 200, isVeg: true, isAvailable: true },
-    { id: '6', categoryId: 'cat7', branchId: '3', name: 'Burger Combo', description: 'Burger + Fries + Coke', price: 300, isVeg: false, isAvailable: true },
+    // Branch 1
+    { id: '1', categoryId: 'cat1', branchId: '1', name: 'Paneer Tikka', description: 'Spicy paneer cubes grilled to perfection', price: 250, isVeg: true, isAvailable: true },
+    { id: '2', categoryId: 'cat2', branchId: '1', name: 'Chicken Biryani', description: 'Hyderabadi style aromatic rice', price: 350, isVeg: false, isAvailable: true },
+    { id: '3', categoryId: 'cat3', branchId: '1', name: 'Cold Coffee', description: 'With chocolate syrup and ice cream', price: 120, isVeg: true, isAvailable: false },
+    { id: '101', categoryId: 'cat1', branchId: '1', name: 'Crispy Corn', description: 'Golden fried sweet corn', price: 180, isVeg: true, isAvailable: true },
+    { id: '102', categoryId: 'cat4', branchId: '1', name: 'Chocolate Brownie', description: 'Served with vanilla ice cream', price: 150, isVeg: true, isAvailable: true },
+
+    // Branch 2
+    { id: '4', categoryId: 'cat5', branchId: '2', name: 'Cappuccino', description: 'Strong brewed coffee with foam', price: 150, isVeg: true, isAvailable: true },
+    { id: '5', categoryId: 'cat6', branchId: '2', name: 'Club Sandwich', description: 'Grilled with veggies and cheese', price: 200, isVeg: true, isAvailable: true },
+    { id: '201', categoryId: 'cat6', branchId: '2', name: 'Blueberry Muffin', description: 'Freshly baked', price: 120, isVeg: true, isAvailable: true },
+    { id: '202', categoryId: 'cat7', branchId: '2', name: 'Iced Lemon Tea', description: 'Refreshing zesty tea', price: 100, isVeg: true, isAvailable: true },
+
+    // Branch 3
+    { id: '6', categoryId: 'cat8', branchId: '3', name: 'Burger Combo', description: 'Burger + Fries + Coke', price: 300, isVeg: false, isAvailable: true },
+    { id: '301', categoryId: 'cat9', branchId: '3', name: 'Margherita Pizza', description: 'Classic cheese pizza', price: 400, isVeg: true, isAvailable: true },
+    { id: '302', categoryId: 'cat9', branchId: '3', name: 'Pepperoni Pizza', description: 'Loaded with pepperoni slices', price: 550, isVeg: false, isAvailable: true },
+    { id: '303', categoryId: 'cat10', branchId: '3', name: 'Crispy Chicken Burger', description: 'With mayo and lettuce', price: 220, isVeg: false, isAvailable: true },
+
+    // Branch 4
+    { id: '401', categoryId: 'cat11', branchId: '4', name: 'Veg Hakka Noodles', description: 'Wok tossed noodles', price: 180, isVeg: true, isAvailable: true },
+    { id: '402', categoryId: 'cat11', branchId: '4', name: 'Chicken Momos', description: 'Steamed dumplings (8 pcs)', price: 160, isVeg: false, isAvailable: true },
+    { id: '403', categoryId: 'cat12', branchId: '4', name: 'Pav Bhaji', description: 'Buttery bread with spicy curry', price: 150, isVeg: true, isAvailable: true },
+    { id: '404', categoryId: 'cat13', branchId: '4', name: 'Quinoa Salad', description: 'High protein healthy bowl', price: 280, isVeg: true, isAvailable: true },
+
+    // Branch 5
+    { id: '501', categoryId: 'cat14', branchId: '5', name: 'Chicken Ham Sandwich', description: 'Ready to eat', price: 250, isVeg: false, isAvailable: true },
+    { id: '502', categoryId: 'cat14', branchId: '5', name: 'Fruit Bowl', description: 'Seasonal fresh fruits', price: 150, isVeg: true, isAvailable: true },
+    { id: '503', categoryId: 'cat15', branchId: '5', name: 'Espresso', description: 'Single shot', price: 180, isVeg: true, isAvailable: true }
   ]);
 
   // Filter Categories by Branch

@@ -5,7 +5,7 @@ import LoadingSpinner from '../common/LoadingSpinner.tsx';
 import { constants } from '../../constants.ts';
 
 interface MobileLoginFormProps {
-  onLogin: (success: boolean) => void;
+  onLogin: (success: boolean, branchId?: string) => void;
 }
 
 const MobileLoginForm: React.FC<MobileLoginFormProps> = ({ onLogin }) => {
@@ -13,17 +13,16 @@ const MobileLoginForm: React.FC<MobileLoginFormProps> = ({ onLogin }) => {
   const [otp, setOtp] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [step, setStep] = useState<1 | 2 | 3>(1); // 1: Mobile, 2: OTP, 3: Branch Select
+  const [step, setStep] = useState<1 | 2>(1); // 1: Mobile, 2: OTP
   const [otpCooldown, setOtpCooldown] = useState<number>(0);
   const otpCooldownRef = useRef<number | null>(null);
   
-  // Mock User Branches
+  // Mock User Branches (used for default login)
   const [userBranches] = useState([
     { id: '1', name: 'Main Campus Cafe' },
     { id: '2', name: 'East Wing Coffee Shop' },
     { id: '3', name: 'Downtown Hub' }
   ]);
-  const [selectedBranchId, setSelectedBranchId] = useState<string>('1');
 
   useEffect(() => {
     if (otpCooldown > 0) {
@@ -71,12 +70,8 @@ const MobileLoginForm: React.FC<MobileLoginFormProps> = ({ onLogin }) => {
     }
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      // In a real app, response would contain available branches
-      if (userBranches.length > 1) {
-          setStep(3); // Go to branch selection
-      } else {
-          onLogin(true); // Direct login if only 1 branch
-      }
+      // Directly login to the first branch, skipping the selection screen
+      onLogin(true, userBranches[0].id); 
     } catch (apiError) {
       setError('Failed to verify OTP.');
     } finally {
@@ -84,23 +79,15 @@ const MobileLoginForm: React.FC<MobileLoginFormProps> = ({ onLogin }) => {
     }
   };
 
-  const handleBranchSelect = (e: React.FormEvent) => {
-      e.preventDefault();
-      // In a real app, you would set the global context here or store token
-      // For this demo, we assume App.tsx sets up default or we pass it up
-      onLogin(true);
-  }
-
   return (
     <div className="bg-white">
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">
-          {step === 1 ? 'Welcome Back' : step === 2 ? 'Verify OTP' : 'Select Branch'}
+          {step === 1 ? 'Welcome Back' : 'Verify OTP'}
         </h2>
         <p className="text-gray-500">
           {step === 1 ? 'Enter your mobile number to access your dashboard.' : 
-           step === 2 ? `Enter the code sent to ${mobileNumber}` : 
-           'Choose the branch you want to manage.'}
+           `Enter the code sent to ${mobileNumber}`}
         </p>
       </div>
 
@@ -172,34 +159,6 @@ const MobileLoginForm: React.FC<MobileLoginFormProps> = ({ onLogin }) => {
               {otpCooldown > 0 ? `Resend available in ${otpCooldown}s` : 'Resend OTP'}
             </Button>
           </div>
-        </form>
-      )}
-
-      {step === 3 && (
-        <form onSubmit={handleBranchSelect} className="space-y-6 animate-modal-in">
-           <div>
-               <label className="block text-sm font-semibold text-gray-700 mb-4">Available Branches</label>
-               <div className="space-y-3">
-                   {userBranches.map(branch => (
-                       <label key={branch.id} className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all ${selectedBranchId === branch.id ? 'border-offoOrange bg-orange-50 ring-1 ring-offoOrange' : 'border-gray-200 hover:border-gray-300'}`}>
-                           <input 
-                                type="radio" 
-                                name="branch" 
-                                value={branch.id} 
-                                checked={selectedBranchId === branch.id}
-                                onChange={() => setSelectedBranchId(branch.id)}
-                                className="h-5 w-5 text-offoOrange focus:ring-offoOrange border-gray-300"
-                           />
-                           <span className={`ml-3 font-medium ${selectedBranchId === branch.id ? 'text-gray-900' : 'text-gray-600'}`}>
-                               {branch.name}
-                           </span>
-                       </label>
-                   ))}
-               </div>
-           </div>
-           <Button type="submit" variant="primary" className="w-full py-3.5 text-lg shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40">
-             Continue to Dashboard
-           </Button>
         </form>
       )}
     </div>

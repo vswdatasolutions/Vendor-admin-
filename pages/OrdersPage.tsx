@@ -17,35 +17,89 @@ const getCurrentTime = () => {
 };
 
 const MOCK_ORDERS_DATA: Order[] = [
+  // Branch 1: Main Campus Cafe
   { 
     id: '404627', branchId: '1', customerName: 'New Customer', address: 'Some Office, 4th Floor', totalAmount: 450, status: OrderStatus.INCOMING, date: getTodayDate(), orderTime: getCurrentTime(), paymentMethod: 'UPI', 
     items: [{id:'1', name:'Veg Burger', quantity:2, price:150}, {id:'2', name:'Coke', quantity:2, price:75}],
     itemImage: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=100&q=80'
   },
   { 
-    id: '403966', branchId: '1', customerName: 'New Customer', address: 'Some Office, 4th Floor', totalAmount: 20, status: OrderStatus.INCOMING, date: getTodayDate(), orderTime: '10:48 AM', paymentMethod: 'Card', 
+    id: '403966', branchId: '1', customerName: 'Rahul Verma', address: 'Reception Area', totalAmount: 20, status: OrderStatus.INCOMING, date: getTodayDate(), orderTime: '10:48 AM', paymentMethod: 'Card', 
     items: [{id:'3', name:'Coffee', quantity:1, price:20}],
     itemImage: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=100&q=80'
   },
   { 
-    id: '594966', branchId: '1', customerName: 'New Customer', address: 'Some Office, 4th Floor', totalAmount: 20, status: OrderStatus.INCOMING, date: getTodayDate(), orderTime: '10:50 AM', paymentMethod: 'UPI', 
-    items: [{id:'3', name:'Coffee', quantity:1, price:20}],
-    itemImage: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=100&q=80'
+    id: '594966', branchId: '1', customerName: 'Simran Kaur', address: 'Meeting Room 2', totalAmount: 350, status: OrderStatus.PREPARING, date: getTodayDate(), orderTime: '10:30 AM', paymentMethod: 'UPI', 
+    items: [{id:'4', name:'Chicken Sandwich', quantity:1, price:200}, {id:'5', name:'Fries', quantity:1, price:150}],
+    itemImage: 'https://images.unsplash.com/photo-1521305916504-4a1121188589?auto=format&fit=crop&w=100&q=80'
   },
   { 
-    id: '102345', branchId: '2', customerName: 'Karan Mehra', address: 'Reception Area', totalAmount: 240, status: OrderStatus.READY_FOR_PICKUP, date: getTodayDate(), orderTime: '10:30 AM', paymentMethod: 'Cash', 
-    items: [{id:'4', name:'Iced Coffee', quantity:2, price:120}],
-    itemImage: 'https://images.unsplash.com/photo-1517701604599-bb29b5c5090c?auto=format&fit=crop&w=100&q=80'
-  },
-  { 
-    id: '105678', branchId: '2', customerName: 'Jenny Doe', address: 'Cabin 3', totalAmount: 150, status: OrderStatus.COMPLETED, date: getTodayDate(), orderTime: '09:30 AM', paymentMethod: 'UPI', 
-    items: [{id:'6', name:'Tea', quantity:2, price:25}, {id:'7', name:'Bun Maska', quantity:2, price:50}],
+    id: '594967', branchId: '1', customerName: 'Amit Patel', address: 'Desk 4B', totalAmount: 180, status: OrderStatus.READY_FOR_PICKUP, date: getTodayDate(), orderTime: '10:15 AM', paymentMethod: 'Cash', 
+    items: [{id:'6', name:'Paneer Wrap', quantity:1, price:180}],
     itemImage: 'https://images.unsplash.com/photo-1571115177098-24ec42ed204d?auto=format&fit=crop&w=100&q=80'
   },
   { 
-    id: '201999', branchId: '3', customerName: 'Charlie Brown', address: 'Meeting Room 1', totalAmount: 1200, status: OrderStatus.SCHEDULED, date: '2023-11-30', orderTime: '10:00 AM', scheduledTime: '02:00 PM', paymentMethod: 'UPI', 
-    items: [{id:'4', name:'Family Meal Pack', quantity:1, price:1200}],
+    id: '594968', branchId: '1', customerName: 'Priya Singh', address: 'Lobby', totalAmount: 1200, status: OrderStatus.COMPLETED, date: getTodayDate(), orderTime: '09:00 AM', paymentMethod: 'Card', 
+    items: [{id:'7', name:'Breakfast Combo', quantity:4, price:300}],
+    itemImage: 'https://images.unsplash.com/photo-1533089862017-ec7374828136?auto=format&fit=crop&w=100&q=80'
+  },
+  { 
+    id: '594969', branchId: '1', customerName: 'Office Party', address: 'Conference Hall A', totalAmount: 5000, status: OrderStatus.SCHEDULED, date: getTodayDate(), orderTime: '09:00 AM', scheduledTime: '02:00 PM', paymentMethod: 'UPI', 
+    items: [{id:'8', name:'Party Platter', quantity:2, price:2500}],
+    itemImage: 'https://images.unsplash.com/photo-1519690889869-e705e59f72e1?auto=format&fit=crop&w=100&q=80'
+  },
+
+  // Branch 2: East Wing Coffee Shop
+  { 
+    id: '102345', branchId: '2', customerName: 'Karan Mehra', address: 'Cabin 3', totalAmount: 240, status: OrderStatus.INCOMING, date: getTodayDate(), orderTime: getCurrentTime(), paymentMethod: 'Cash', 
+    items: [{id:'9', name:'Iced Coffee', quantity:2, price:120}],
+    itemImage: 'https://images.unsplash.com/photo-1517701604599-bb29b5c5090c?auto=format&fit=crop&w=100&q=80'
+  },
+  { 
+    id: '102346', branchId: '2', customerName: 'Neha Dhupia', address: 'Desk 12', totalAmount: 150, status: OrderStatus.PREPARING, date: getTodayDate(), orderTime: '10:40 AM', paymentMethod: 'UPI', 
+    items: [{id:'10', name:'Cappuccino', quantity:1, price:150}],
+    itemImage: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?auto=format&fit=crop&w=100&q=80'
+  },
+  { 
+    id: '102347', branchId: '2', customerName: 'John Snow', address: 'Entrance', totalAmount: 300, status: OrderStatus.COMPLETED, date: getTodayDate(), orderTime: '09:30 AM', paymentMethod: 'Card', 
+    items: [{id:'11', name:'Mocha', quantity:1, price:180}, {id:'12', name:'Cookie', quantity:2, price:60}],
+    itemImage: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=100&q=80'
+  },
+
+  // Branch 3: Downtown Hub
+  { 
+    id: '201999', branchId: '3', customerName: 'Charlie Brown', address: 'Meeting Room 1', totalAmount: 1200, status: OrderStatus.INCOMING, date: getTodayDate(), orderTime: getCurrentTime(), paymentMethod: 'UPI', 
+    items: [{id:'13', name:'Family Meal Pack', quantity:1, price:1200}],
     itemImage: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=100&q=80'
+  },
+  { 
+    id: '202000', branchId: '3', customerName: 'Lucy Van Pelt', address: 'Booth 5', totalAmount: 450, status: OrderStatus.READY_FOR_PICKUP, date: getTodayDate(), orderTime: '10:15 AM', paymentMethod: 'Cash', 
+    items: [{id:'14', name:'Pizza Slice', quantity:3, price:150}],
+    itemImage: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=100&q=80'
+  },
+
+  // Branch 4: Westside Food Court
+  { 
+    id: '305001', branchId: '4', customerName: 'David Miller', address: 'Table 45', totalAmount: 850, status: OrderStatus.INCOMING, date: getTodayDate(), orderTime: getCurrentTime(), paymentMethod: 'Card', 
+    items: [{id:'15', name:'Sushi Platter', quantity:1, price:850}],
+    itemImage: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=100&q=80'
+  },
+  { 
+    id: '305002', branchId: '4', customerName: 'Emma Watson', address: 'Table 12', totalAmount: 320, status: OrderStatus.PREPARING, date: getTodayDate(), orderTime: '10:55 AM', paymentMethod: 'UPI', 
+    items: [{id:'16', name:'Noodles', quantity:1, price:200}, {id:'17', name:'Dumplings', quantity:1, price:120}],
+    itemImage: 'https://images.unsplash.com/photo-1552611052-33e04de081de?auto=format&fit=crop&w=100&q=80'
+  },
+  { 
+    id: '305003', branchId: '4', customerName: 'Chris Evans', address: 'Takeaway', totalAmount: 150, status: OrderStatus.COMPLETED, date: getTodayDate(), orderTime: '10:00 AM', paymentMethod: 'Cash', 
+    items: [{id:'18', name:'Boba Tea', quantity:1, price:150}],
+    itemImage: 'https://images.unsplash.com/photo-1558857563-b371033873b8?auto=format&fit=crop&w=100&q=80'
+  },
+
+  // Branch 5: Airport Transit Cafe
+  { 
+    id: '501001', branchId: '5', customerName: 'Traveler Joe', address: 'Gate 4', totalAmount: 550, status: OrderStatus.COMPLETED, date: '2023-11-28', orderTime: '08:00 AM', paymentMethod: 'Card', 
+    items: [{id:'19', name:'Club Sandwich', quantity:1, price:350}, {id:'20', name:'Espresso', quantity:1, price:200}],
+    itemImage: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=100&q=80'
   }
 ];
 
@@ -97,30 +151,38 @@ export const OrdersPage: React.FC = () => {
   // Simulate Real-time incoming orders for current branch
   useEffect(() => {
     const interval = setInterval(() => {
-        if (orders.length < 50) {
+        if (orders.length < 50 && currentBranch?.status === 'Active') {
             const newOrder = generateRandomOrder(currentBranchId);
+            // Prepend new order to ensure it appears at top (Latest First)
             setAllOrders(prev => [newOrder, ...prev]);
             showNotification(`New Order #${newOrder.id} received!`);
         }
-    }, 15000); 
+    }, 10000); // Poll every 10 seconds
 
     return () => clearInterval(interval);
-  }, [orders.length, currentBranchId]);
+  }, [orders.length, currentBranchId, currentBranch]);
 
   const generateRandomOrder = (branchId: string): Order => {
-      const id = Math.floor(Math.random() * 900000) + 100000;
-      const names = ['New Customer', 'Mike Ross', 'Rachel Green', 'Joey T', 'Monica G'];
+      // Generate ID based on timestamp to ensure unique and distinct ID
+      // Modulo to keep it within 6 digits for UI consistency
+      const id = Math.floor(Date.now() % 1000000).toString().padStart(6, '0');
+      
+      const names = ['New Customer', 'Mike Ross', 'Rachel Green', 'Joey T', 'Monica G', 'Phoebe B', 'Ross G'];
       const itemsList = [
           {id:'1', name:'Coffee', quantity:1, price:20}, 
           {id:'2', name:'Veg Burger', quantity:1, price:150},
           {id:'3', name:'Fries', quantity:1, price:100},
-          {id:'4', name:'Pasta', quantity:1, price:250}
+          {id:'4', name:'Pasta', quantity:1, price:250},
+          {id:'5', name:'Pizza', quantity:1, price:450},
+          {id:'6', name:'Salad', quantity:1, price:180}
       ];
       const images = [
           'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=100&q=80',
           'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=100&q=80',
           'https://images.unsplash.com/photo-1576107232684-1279f390859f?auto=format&fit=crop&w=100&q=80',
-          'https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?auto=format&fit=crop&w=100&q=80'
+          'https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?auto=format&fit=crop&w=100&q=80',
+          'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=100&q=80',
+          'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=100&q=80'
       ];
       const randomItemIdx = Math.floor(Math.random() * itemsList.length);
       const orderItems = [itemsList[randomItemIdx]];
@@ -204,18 +266,21 @@ export const OrdersPage: React.FC = () => {
       });
   };
 
-  const filteredOrders = filterList(getTabOrders());
+  // 3. Sort List (Ensure stable sort before slicing)
+  const sortList = (list: Order[]) => {
+      // For incoming, we rely on natural array order because new orders are prepended.
+      // This ensures "Latest First" without needing to parse complex time strings.
+      // Other tabs can also rely on insertion order or status update order.
+      return list;
+  }
 
-  // 3. Paginate
+  const filteredOrders = sortList(filterList(getTabOrders()));
+
+  // 4. Paginate
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentOrders = filteredOrders.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
-
-  // Sorting: Incoming is newest first
-  if (activeTab === 'incoming') {
-      currentOrders.sort((a, b) => b.id.localeCompare(a.id));
-  }
 
   const toggleSelection = (e: React.ChangeEvent<HTMLInputElement>, id: string) => {
     e.stopPropagation();
@@ -307,6 +372,9 @@ export const OrdersPage: React.FC = () => {
           return (
               <div className="flex flex-col items-center justify-center py-20 bg-white rounded-b-lg border border-t-0 border-gray-200">
                   <p className="text-gray-500 font-medium">No orders found.</p>
+                  {activeTab === 'incoming' && (
+                     <p className="text-sm text-gray-400 mt-2">Waiting for new orders...</p>
+                  )}
               </div>
           )
       }
@@ -347,6 +415,7 @@ export const OrdersPage: React.FC = () => {
                                     <span className="text-sm font-bold text-gray-900">#{order.id}</span>
                                     <span className="text-sm font-bold text-gray-800">{order.customerName}</span>
                                     <span className="text-xs text-gray-500">{order.address || 'Unknown Address'}</span>
+                                    <span className="text-xs font-bold text-offoOrange mt-1">{getBranchName(order.branchId)}</span>
                                     <span className="text-xs text-red-500 mt-1">{getTimeAgo(order.date, order.orderTime)}</span>
                                 </div>
                             </td>
@@ -367,12 +436,17 @@ export const OrdersPage: React.FC = () => {
                             <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="text-sm font-bold text-gray-900">₹{order.totalAmount.toFixed(2)}</div>
                                 <div className="flex items-center text-xs text-green-600 font-medium">
-                                    Paid
+                                    Paid ({order.paymentMethod})
                                     <svg className="w-3 h-3 ml-1 bg-green-500 text-white rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
                                 </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                                <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-500">
+                                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                    order.status === OrderStatus.INCOMING ? 'bg-red-100 text-red-500' : 
+                                    order.status === OrderStatus.PREPARING ? 'bg-blue-100 text-blue-600' :
+                                    order.status === OrderStatus.READY_FOR_PICKUP ? 'bg-green-100 text-green-600' :
+                                    'bg-gray-100 text-gray-600'
+                                }`}>
                                     {order.status === OrderStatus.INCOMING ? 'Pending' : order.status}
                                 </span>
                             </td>
@@ -395,10 +469,10 @@ export const OrdersPage: React.FC = () => {
                                         </>
                                     )}
                                     {order.status === OrderStatus.PREPARING && (
-                                        <button onClick={() => updateOrderStatus(order.id, OrderStatus.READY_FOR_PICKUP)} className="text-blue-600 hover:text-blue-900">Mark Ready</button>
+                                        <button onClick={() => updateOrderStatus(order.id, OrderStatus.READY_FOR_PICKUP)} className="text-blue-600 hover:text-blue-900 font-medium">Mark Ready</button>
                                     )}
                                     {order.status === OrderStatus.READY_FOR_PICKUP && (
-                                        <button onClick={() => updateOrderStatus(order.id, OrderStatus.COMPLETED)} className="text-green-600 hover:text-green-900">Complete</button>
+                                        <button onClick={() => updateOrderStatus(order.id, OrderStatus.COMPLETED)} className="text-green-600 hover:text-green-900 font-medium">Complete</button>
                                     )}
                                      <Button variant="ghost" size="sm" onClick={() => setSelectedOrder(order)}>Details</Button>
                                 </div>
@@ -479,6 +553,12 @@ export const OrdersPage: React.FC = () => {
              >
                  Incoming Orders
                  <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">{getTabCount('incoming')}</span>
+                 {activeTab === 'incoming' && (
+                     <span className="ml-2 flex h-2 w-2 relative" title="Live updates active">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                     </span>
+                 )}
              </button>
              <button 
                 onClick={() => setActiveTab('preparing')}
@@ -498,22 +578,80 @@ export const OrdersPage: React.FC = () => {
              >
                  Picked Up
              </button>
+             <button 
+                onClick={() => setActiveTab('scheduled')}
+                className={`text-sm font-bold pb-1 border-b-2 transition-colors ${activeTab === 'scheduled' ? 'text-offoOrange border-offoOrange' : 'text-gray-500 border-transparent hover:text-gray-700'}`}
+             >
+                 Scheduled
+             </button>
         </div>
 
         {/* Filter Bar */}
-        {selectedOrderIds.size > 0 && (
-             <div className="bg-orange-50 border-x border-gray-200 p-3 flex justify-between items-center px-6">
-                 <span className="text-sm font-medium text-orange-800">{selectedOrderIds.size} Orders Selected</span>
-                 <div className="flex gap-2">
-                    {activeTab === 'incoming' && (
-                        <>
-                            <Button size="sm" onClick={() => handleBulkAction('accept')}>Accept Selected</Button>
-                            <Button variant="danger" size="sm" onClick={() => handleBulkAction('reject')}>Reject Selected</Button>
-                        </>
+        <div className="bg-gray-50 border-x border-gray-200 p-3 px-6">
+            {selectedOrderIds.size > 0 ? (
+                <div className="flex justify-between items-center w-full">
+                    <span className="text-sm font-medium text-orange-800">{selectedOrderIds.size} Orders Selected</span>
+                    <div className="flex gap-2">
+                        {activeTab === 'incoming' && (
+                            <>
+                                <Button size="sm" onClick={() => handleBulkAction('accept')}>Accept Selected</Button>
+                                <Button variant="danger" size="sm" onClick={() => handleBulkAction('reject')}>Reject Selected</Button>
+                            </>
+                        )}
+                    </div>
+                </div>
+            ) : (
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 flex-1">
+                        <input 
+                            type="text" 
+                            placeholder="Search Order ID or Name" 
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="border border-gray-300 rounded px-3 py-1.5 text-sm"
+                        />
+                        <input 
+                            type="date" 
+                            value={filterDate}
+                            onChange={(e) => setFilterDate(e.target.value)}
+                            className="border border-gray-300 rounded px-3 py-1.5 text-sm"
+                        />
+                         <div className="flex gap-2">
+                            <input 
+                                type="number" 
+                                placeholder="Min ₹" 
+                                value={minAmount}
+                                onChange={(e) => setMinAmount(e.target.value)}
+                                className="border border-gray-300 rounded px-3 py-1.5 text-sm w-full"
+                            />
+                            <input 
+                                type="number" 
+                                placeholder="Max ₹" 
+                                value={maxAmount}
+                                onChange={(e) => setMaxAmount(e.target.value)}
+                                className="border border-gray-300 rounded px-3 py-1.5 text-sm w-full"
+                            />
+                        </div>
+                         {(searchQuery || filterDate || minAmount || maxAmount) && (
+                            <button 
+                                onClick={() => { setSearchQuery(''); setFilterDate(''); setMinAmount(''); setMaxAmount(''); }}
+                                className="text-sm text-red-500 font-medium hover:underline text-left md:text-center"
+                            >
+                                Clear Filters
+                            </button>
+                        )}
+                    </div>
+                    
+                    {/* Bulk Actions for All Items (Only on Incoming Tab) */}
+                    {activeTab === 'incoming' && filteredOrders.length > 0 && (
+                        <div className="flex gap-2 border-l pl-4 border-gray-300 ml-2">
+                             <Button size="sm" variant="outline" onClick={handleAcceptAllIncoming} className="whitespace-nowrap">Accept All</Button>
+                             <Button size="sm" variant="danger" onClick={handleRejectAllIncoming} className="whitespace-nowrap">Reject All</Button>
+                        </div>
                     )}
-                 </div>
-             </div>
-        )}
+                </div>
+            )}
+        </div>
         
         {/* Order List */}
         {renderOrderList()}
@@ -552,6 +690,9 @@ export const OrdersPage: React.FC = () => {
                     <p className="text-sm text-gray-500">{selectedOrder.address}</p>
                     <p className="text-sm text-gray-500 mt-2">Payment: {selectedOrder.paymentMethod}</p>
                     <p className="text-sm text-gray-500">Placed at: {selectedOrder.orderTime}</p>
+                    {selectedOrder.status === OrderStatus.SCHEDULED && (
+                        <p className="text-sm font-bold text-orange-600 mt-2">Scheduled for: {selectedOrder.scheduledTime}</p>
+                    )}
                 </div>
 
                 <div>

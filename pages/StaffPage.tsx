@@ -1,5 +1,4 @@
 
-
 import React, { useState, useMemo } from 'react';
 import Button from '../components/common/Button.tsx';
 import Modal from '../components/common/Modal.tsx';
@@ -11,11 +10,25 @@ export const StaffPage: React.FC = () => {
   const { currentBranchId, currentBranch, branches } = useBranch();
   
   const [allStaff, setAllStaff] = useState<StaffMember[]>([
+    // Branch 1: Main Campus Cafe
     { id: '1', name: 'Sunny Thakur', email: 'sunny@example.com', phone: '+91 9876543210', role: StaffRole.BRANCH_ADMIN, branchId: '1', branchName: 'Main Campus Cafe', isActive: true, lastActivity: new Date('2025-11-28') },
     { id: '2', name: 'Ganesh M', email: 'ganesh@example.com', phone: '+91 9988776655', role: StaffRole.KITCHEN, branchId: '1', branchName: 'Main Campus Cafe', isActive: true, lastActivity: new Date('2025-11-28') },
-    { id: '3', name: 'Venkateshwara', email: 'venkat@example.com', phone: '+91 9000000000', role: StaffRole.STAFF, branchId: '2', branchName: 'East Wing Coffee Shop', isActive: false, lastActivity: new Date('2025-11-28') },
     { id: '4', name: 'Ramesh B', email: 'ramesh@example.com', phone: '+91 9123456789', role: StaffRole.BILLING, branchId: '1', branchName: 'Main Campus Cafe', isActive: true, lastActivity: new Date('2025-11-28') },
+    
+    // Branch 2: East Wing Coffee Shop
+    { id: '3', name: 'Venkateshwara', email: 'venkat@example.com', phone: '+91 9000000000', role: StaffRole.STAFF, branchId: '2', branchName: 'East Wing Coffee Shop', isActive: false, lastActivity: new Date('2025-11-28') },
+    { id: '6', name: 'Anjali Sharma', email: 'anjali@example.com', phone: '+91 9888123456', role: StaffRole.MANAGER, branchId: '2', branchName: 'East Wing Coffee Shop', isActive: true, lastActivity: new Date('2025-11-29') },
+
+    // Branch 3: Downtown Hub
     { id: '5', name: 'Sarah Lee', email: 'sarah@example.com', phone: '+91 9123456799', role: StaffRole.MANAGER, branchId: '3', branchName: 'Downtown Hub', isActive: true, lastActivity: new Date('2025-11-29') },
+    { id: '7', name: 'Mike Ross', email: 'mike@example.com', phone: '+91 8877665544', role: StaffRole.KITCHEN, branchId: '3', branchName: 'Downtown Hub', isActive: true, lastActivity: new Date('2025-11-29') },
+
+    // Branch 4: Westside Food Court
+    { id: '8', name: 'Rajesh Kumar', email: 'rajesh@example.com', phone: '+91 7776665555', role: StaffRole.BRANCH_ADMIN, branchId: '4', branchName: 'Westside Food Court', isActive: true, lastActivity: new Date('2025-11-30') },
+    { id: '9', name: 'Deepika P', email: 'deepika@example.com', phone: '+91 9998887777', role: StaffRole.STAFF, branchId: '4', branchName: 'Westside Food Court', isActive: true, lastActivity: new Date('2025-11-30') },
+
+    // Branch 5: Airport Transit Cafe
+    { id: '10', name: 'John Wick', email: 'john@example.com', phone: '+91 6665554444', role: StaffRole.MANAGER, branchId: '5', branchName: 'Airport Transit Cafe', isActive: true, lastActivity: new Date('2025-11-25') },
   ]);
 
   // Filter staff by current branch context

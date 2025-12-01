@@ -17,8 +17,12 @@ import { BranchProvider } from './context/BranchContext.tsx';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [initialBranchId, setInitialBranchId] = useState<string>('1');
 
-  const handleLogin = (isSuccess: boolean) => {
+  const handleLogin = (isSuccess: boolean, branchId?: string) => {
+    if (branchId) {
+      setInitialBranchId(branchId);
+    }
     setIsAuthenticated(isSuccess);
   };
 
@@ -33,7 +37,7 @@ const App: React.FC = () => {
           path="*"
           element={
             isAuthenticated ? (
-              <BranchProvider>
+              <BranchProvider initialBranchId={initialBranchId}>
                 <MainLayout onLogout={() => setIsAuthenticated(false)}>
                   <Routes>
                     <Route path={constants.routes.OVERVIEW} element={<OverviewPage />} />

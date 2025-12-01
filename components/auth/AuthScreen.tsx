@@ -1,9 +1,10 @@
+
 import React from 'react';
 import MobileLoginForm from './MobileLoginForm.tsx';
 import { constants } from '../../constants.ts';
 
 interface AuthScreenProps {
-  onLogin: (success: boolean) => void;
+  onLogin: (success: boolean, branchId?: string) => void;
 }
 
 export const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin }) => {
@@ -37,7 +38,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin }) => {
            
            <div className="mt-10 pt-6 border-t border-gray-100 text-center">
              <p className="text-sm text-gray-400">
-               © 2024 OFFO. All rights reserved.
+               © 2025 OFFO. All rights reserved.
              </p>
            </div>
         </div>
